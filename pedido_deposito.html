@@ -84,14 +84,54 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:
 .btn-pdf{width:100%;padding:14px;background:#1a3a5c;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;margin-bottom:8px}
 .btn-pdf:active{background:#0e2244}
 .btn-del{width:100%;padding:12px;background:none;color:#e00;border:2px solid #e00;border-radius:10px;font-size:15px;font-weight:700}
-.cat-sub{font-size:10px;font-weight:800;color:#1a3a5c;text-transform:uppercase;padding:8px 0 2px;letter-spacing:0.5px}
+.cat-sub{font-size:10px;font-weight:800;color:#1a3a5c;background:#ddeeff;text-transform:uppercase;padding:6px 4px;letter-spacing:0.5px;margin-top:4px;border-radius:4px}
+.btnosc{background:none;border:2px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:800;margin-right:8px}
+.btnosc:active{background:rgba(255,255,255,.15)}
+
+/* MODO OSCURO */
+body.osc{background:#11151e}
+body.osc .hdr{background:#0b1929}
+body.osc .bar{background:#1c2333;border-bottom-color:#2a2f3e}
+body.osc .bar input{background:#11151e;border-color:#3a3f52;color:#dde3f0}
+body.osc .bar input::placeholder{color:#555}
+body.osc .tabs{background:#1c2333;border-bottom-color:#2a2f3e}
+body.osc .tab{color:#666}
+body.osc .tab.on{color:#7fb8f0;border-bottom-color:#7fb8f0}
+body.osc .sec{background:transparent}
+body.osc .cat{color:#4a5068}
+body.osc .p{background:#1c2333;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+body.osc .p.on{background:#162340;border-left-color:#7fb8f0}
+body.osc .pn{color:#dde3f0}
+body.osc .pm{color:#555}
+body.osc .pv-n{color:#7fb8f0}
+body.osc .bm{background:#2a2f3e;color:#888}
+body.osc .bm:active{background:#3a3f52}
+body.osc .panel{background:#1c2333}
+body.osc .ptop{background:#0b1929}
+body.osc .pbody .slbl{color:#666}
+body.osc .pbody .cat-sub{color:#7fb8f0;background:#162340}
+body.osc .ir{border-bottom-color:#2a2f3e}
+body.osc .irn{color:#dde3f0}
+body.osc .irq{color:#7fb8f0}
+body.osc .irql{color:#555}
+body.osc .ppie{border-top-color:#2a2f3e;background:#1c2333}
+body.osc .ptotal{color:#dde3f0}
+body.osc .btn-del{color:#ff6666;border-color:#ff6666}
+body.osc .vpanel{background:#1c2333}
+body.osc .vtit{color:#7fb8f0}
+body.osc .vopt{border-bottom-color:#2a2f3e}
+body.osc .voname{color:#dde3f0}
+body.osc .vocount b{color:#7fb8f0}
 </style>
 </head>
 <body>
 
 <div class="hdr">
   <div><div class="htitle">Pedido Deposito</div><div class="hsubt" id="hsubt">0 pallets · $0</div></div>
-  <button class="btnped" data-a="panel">Pedido <span class="bdg" id="bdg">0</span></button>
+  <div style="display:flex;align-items:center;gap:6px">
+    <button class="btnosc" id="btnosc" onclick="toggleOsc()">🌙</button>
+    <button class="btnped" data-a="panel">Pedido <span class="bdg" id="bdg">0</span></button>
+  </div>
 </div>
 
 <div class="bar"><input id="nom" type="text" placeholder="Nombre del empleado..." autocomplete="off"></div>
@@ -613,7 +653,7 @@ function verPDF(){
     rows+='<tr style="background:#1a3a5c;color:#fff"><td colspan="2" style="padding:8px 10px;font-weight:800">'+seclabels[t]+'</td></tr>';
     for(var ci=0;ci<ord[t].length;ci++){
       var cat=ord[t][ci],items=secs[t].cats[cat];
-      if(cat) rows+='<tr style="background:#ddeeff"><td colspan="2" style="padding:5px 10px;font-size:11px;font-weight:800;color:#1a3a5c;text-transform:uppercase;letter-spacing:0.5px">'+cat+'</td></tr>';
+      if(cat) rows+='<tr style="background:#1a3a5c;color:#fff"><td colspan="2" style="padding:8px 10px;font-weight:800">'+cat+'</td></tr>';
       for(var r=0;r<items.length;r++){
         rows+='<tr><td style="padding:8px 10px">'+items[r].nm+'</td><td style="padding:8px 10px;text-align:center">'+items[r].qty+' pal</td></tr>';
       }
@@ -666,6 +706,17 @@ function fmt(n){
   for(var i=s.length-1;i>=0;i--){if(c>0&&c%3===0)o='.'+o;o=s[i]+o;c++;}
   return '$'+o;
 }
+
+// ── MODO OSCURO ───────────────────────────────────────
+function toggleOsc(){
+  var osc=!document.body.classList.contains('osc');
+  document.body.classList.toggle('osc',osc);
+  document.getElementById('btnosc').textContent=osc?'☀':'🌙';
+  try{localStorage.setItem('osc',osc?'1':'');}catch(e){}
+}
+(function(){
+  try{if(localStorage.getItem('osc')){document.body.classList.add('osc');document.getElementById('btnosc').textContent='☀';}}catch(e){}
+})();
 
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
