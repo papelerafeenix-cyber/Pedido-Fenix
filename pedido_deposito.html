@@ -488,7 +488,7 @@ function updHdr(){
     if(key.indexOf('|')>=0) id=parseInt(key.split('|')[0]);
     if(D[id]){tp+=qty; tc+=qty*D[id][0]*D[id][1];}
   }
-  document.getElementById('hsubt').textContent=tp+' pallet'+(tp!==1?'s':'')+' · '+fmt(tc);
+  document.getElementById('hsubt').textContent=tp+' pallet'+(tp!==1?'s':'');
   var b=document.getElementById('bdg');
   b.textContent=tp; b.style.display=tp>0?'inline':'none';
 }
