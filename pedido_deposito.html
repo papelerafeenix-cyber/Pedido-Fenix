@@ -84,6 +84,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:
 .btn-pdf{width:100%;padding:14px;background:#1a3a5c;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;margin-bottom:8px}
 .btn-pdf:active{background:#0e2244}
 .btn-del{width:100%;padding:12px;background:none;color:#e00;border:2px solid #e00;border-radius:10px;font-size:15px;font-weight:700}
+.cat-sub{font-size:10px;font-weight:800;color:#1a3a5c;text-transform:uppercase;padding:8px 0 2px;letter-spacing:0.5px}
 </style>
 </head>
 <body>
@@ -274,14 +275,13 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:
 <div class="p" id="p126" data-n="laminas rollo 20x25 25x35"><div class="pi"><div class="pn">LAMINAS ROLLO · 20x25 / 25x35</div><div class="pm">36 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="126">−</button><span class="pv" id="v126"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="126">+</button></div></div>
 <div class="p" id="p127" data-n="14x14 laminas rollo"><div class="pi"><div class="pn">14x14 LAMINAS ROLLO</div><div class="pm">36 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="127">−</button><span class="pv" id="v127"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="127">+</button></div></div>
 <div class="p" id="p128" data-n="18x18 laminas rollo"><div class="pi"><div class="pn">18x18 LAMINAS ROLLO</div><div class="pm">36 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="128">−</button><span class="pv" id="v128"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="128">+</button></div></div>
-</div>
-
 
 <div class="cat">ROLLO ARRANQUE</div>
 <div class="p" id="p129" data-n="arranque 1.5 kg 1500 rollo arranque"><div class="pi"><div class="pn">ARRANQUE 1.5 KG</div><div class="pm">rollo<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="129">−</button><span class="pv" id="v129"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="129">+</button></div></div>
 <div class="p" id="p130" data-n="arranque 750 gramos rollo arranque"><div class="pi"><div class="pn">ARRANQUE 750g</div><div class="pm">rollo<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="130">−</button><span class="pv" id="v130"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="130">+</button></div></div>
 <div class="p" id="p131" data-n="estrella 1.3 kg 1300 rollo arranque"><div class="pi"><div class="pn">ESTRELLA 1.3 KG</div><div class="pm">rollo<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="131">−</button><span class="pv" id="v131"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="131">+</button></div></div>
 <div class="p" id="p132" data-n="estrellita 650 gramos rollo arranque"><div class="pi"><div class="pn">ESTRELLITA 650g</div><div class="pm">rollo<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="132">−</button><span class="pv" id="v132"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="132">+</button></div></div>
+</div>
 <!-- VARIANT POPUP -->
 <div class="vov" id="vov" onclick="if(event.target===this)cerrarVar()">
   <div class="vpanel">
@@ -356,11 +356,40 @@ var V={
   121:["20x30","25x35","30x40","35x45","40x50","45x60","50x70","60x90"],
   124:["20x25","25x35","30x30","37x50"],
   126:["20x25","25x35"],
-129:["25x35","30x40","35x45","40x50","50x70","60x90"],
-130:["25x35","30x40","35x45","40x50"],
-131:["25x35","30x40","35x45","40x50","50x70"],
-132:["25x35","30x40","35x45","40x50"]
+129:["20x30","25x35","30x40","35x45","40x50","50x70","60x90"],
+130:["20x30","25x35","30x40","35x45","40x50"],
+131:["20x30","25x35","30x40","35x45","40x50","50x70"],
+132:["20x30","25x35","30x40","35x45","40x50"]
 };
+
+// C[i] = categoría del producto i (para subtítulos en el reporte)
+var C=[
+'IMPRESAS OXI 30x40','IMPRESAS OXI 30x40',
+'IMPRESAS OXI 40x50-60x80','IMPRESAS OXI 40x50-60x80','IMPRESAS OXI 40x50-60x80','IMPRESAS OXI 40x50-60x80','IMPRESAS OXI 40x50-60x80','IMPRESAS OXI 40x50-60x80','IMPRESAS OXI 40x50-60x80','IMPRESAS OXI 40x50-60x80','IMPRESAS OXI 40x50-60x80',
+'CIUDAD VERDE/NEGRA','CIUDAD VERDE/NEGRA','CIUDAD VERDE/NEGRA','CIUDAD VERDE/NEGRA','CIUDAD VERDE/NEGRA',
+'TRANSPARENTE CRISTAL','TRANSPARENTE CRISTAL','TRANSPARENTE CRISTAL',
+'LISAS 20x30/30x40','LISAS 20x30/30x40','LISAS 20x30/30x40','LISAS 20x30/30x40','LISAS 20x30/30x40','LISAS 20x30/30x40','LISAS 20x30/30x40',
+'LISAS 40x50','LISAS 40x50','LISAS 40x50','LISAS 40x50','LISAS 40x50','LISAS 40x50','LISAS 40x50','LISAS 40x50','LISAS 40x50','LISAS 40x50',
+'LISAS 45x60/50x70/60x80','LISAS 45x60/50x70/60x80','LISAS 45x60/50x70/60x80','LISAS 45x60/50x70/60x80','LISAS 45x60/50x70/60x80','LISAS 45x60/50x70/60x80','LISAS 45x60/50x70/60x80','LISAS 45x60/50x70/60x80','LISAS 45x60/50x70/60x80','LISAS 45x60/50x70/60x80',
+'RAYADAS','RAYADAS','RAYADAS','RAYADAS','RAYADAS','RAYADAS',
+'PERLA NEGRA','PERLA NEGRA','PERLA NEGRA','PERLA NEGRA','PERLA NEGRA',
+'TIBURON LILA','TIBURON LILA','TIBURON LILA','TIBURON LILA','TIBURON LILA','TIBURON LILA','TIBURON LILA','TIBURON LILA','TIBURON LILA','TIBURON LILA','TIBURON LILA',
+'','','','',
+'CAJA RESIDUOS BD','CAJA RESIDUOS BD','CAJA RESIDUOS BD','CAJA RESIDUOS BD',
+'CAJA CONSORCIOS BD','CAJA CONSORCIOS BD','CAJA CONSORCIOS BD','CAJA CONSORCIOS BD','CAJA CONSORCIOS BD','CAJA CONSORCIOS BD','CAJA CONSORCIOS BD',
+'FREEZER/BAÑO/MASCOTA','FREEZER/BAÑO/MASCOTA','FREEZER/BAÑO/MASCOTA',
+'BULTO RESIDUOS BD','BULTO RESIDUOS BD','BULTO RESIDUOS BD','BULTO RESIDUOS BD',
+'','','','','',
+'COMPACTERAS','COMPACTERAS','COMPACTERAS','COMPACTERAS',
+'PEQUENO ALTA DENSIDAD','PEQUENO BAJA DENSIDAD',
+'RENDIDOR FUNDA AZUL','RENDIDOR FUNDA AZUL','RENDIDOR FUNDA AZUL','RENDIDOR FUNDA AZUL','RENDIDOR FUNDA AZUL',
+'RENDIDOR FUNDA ROJA','RENDIDOR FUNDA ROJA','RENDIDOR FUNDA ROJA','RENDIDOR FUNDA ROJA','RENDIDOR FUNDA ROJA','RENDIDOR FUNDA ROJA','RENDIDOR FUNDA ROJA','RENDIDOR FUNDA ROJA','RENDIDOR FUNDA ROJA','RENDIDOR FUNDA ROJA',
+'VIOLETA ALTA','',
+'ARRANQUE SIN CONO','','',
+'NARANJA BAJA','','',
+'LAMINA PAQUETE 1KG','LAMINA ECO 900g','LAMINAS ROLLO 1KG','LAMINAS ROLLO 1KG','LAMINAS ROLLO 1KG',
+'ROLLO ARRANQUE','ROLLO ARRANQUE','ROLLO ARRANQUE','ROLLO ARRANQUE'
+];
 
 // Q: clave="id" para simples, "id|variante" para variantes
 var Q={};
@@ -491,24 +520,43 @@ function cerrarVar(){document.getElementById('vov').style.display='none';varId=n
 function abrirPanel(){renderCart();document.getElementById('ovl').className='ovl on';}
 function cerrar(){document.getElementById('ovl').className='ovl';}
 
+function buildItems(){
+  var ks=Object.keys(Q),totalPal=0;
+  ks.sort(function(a,b){return parseInt(a)-parseInt(b);});
+  var secs={0:{l:'CAMISETAS',cats:{}},1:{l:'RESIDUOS',cats:{}},2:{l:'LAMINA / ARRANQUE',cats:{}}};
+  var ord={0:[],1:[],2:[]};
+  for(var k=0;k<ks.length;k++){
+    var key=ks[k],qty=Q[key],id,vn=null;
+    if(key.indexOf('|')>=0){var p=key.indexOf('|');id=parseInt(key.substring(0,p));vn=key.substring(p+1);}
+    else id=parseInt(key);
+    var t=D[id][2]; totalPal+=qty;
+    var cat=C[id]||'';
+    var nm=vn?vn+' ('+document.querySelector('#p'+id+' .pn').textContent.split(' ')[0]+')':document.querySelector('#p'+id+' .pn').textContent;
+    if(!secs[t].cats[cat]){secs[t].cats[cat]=[];ord[t].push(cat);}
+    secs[t].cats[cat].push({nm:nm,qty:qty});
+  }
+  return {secs:secs,ord:ord,totalPal:totalPal};
+}
+
 function renderCart(){
   var ks=Object.keys(Q),body=document.getElementById('pbody');
   if(!ks.length){
     body.innerHTML='<div class="vacio">No hay productos.<br>Suma pallets desde la lista.</div>';
     document.getElementById('ptot').innerHTML=''; return;
   }
-  var secs={0:{l:'CAMISETAS',r:[]},1:{l:'RESIDUOS',r:[]},2:{l:'LAMINA / ARRANQUE',r:[]}};
-  var totalPal=0;
-  for(var k=0;k<ks.length;k++){
-    var key=ks[k],qty=Q[key],id,vn=null;
-    if(key.indexOf('|')>=0){var p=key.indexOf('|');id=parseInt(key.substring(0,p));vn=key.substring(p+1);}
-    else id=parseInt(key);
-    var t=D[id][2]; totalPal+=qty;
-    var nm=vn?vn+' ('+document.querySelector('#p'+id+' .pn').textContent.split(' ')[0]+')':document.querySelector('#p'+id+' .pn').textContent;
-    secs[t].r.push('<div class="ir"><div class="irn">'+nm+'</div><div><div class="irq">'+qty+'</div><div class="irql">pallets</div></div></div>');
-  }
+  var b=buildItems(),secs=b.secs,ord=b.ord,totalPal=b.totalPal;
   var html='';
-  for(var t=0;t<3;t++){if(secs[t].r.length) html+='<div class="slbl">'+secs[t].l+'</div>'+secs[t].r.join('');}
+  for(var t=0;t<3;t++){
+    if(!ord[t].length) continue;
+    html+='<div class="slbl">'+secs[t].l+'</div>';
+    for(var ci=0;ci<ord[t].length;ci++){
+      var cat=ord[t][ci],items=secs[t].cats[cat];
+      if(cat) html+='<div class="cat-sub">'+cat+'</div>';
+      for(var r=0;r<items.length;r++){
+        html+='<div class="ir"><div class="irn">'+items[r].nm+'</div><div><div class="irq">'+items[r].qty+'</div><div class="irql">pallets</div></div></div>';
+      }
+    }
+  }
   body.innerHTML=html;
   document.getElementById('ptot').innerHTML=totalPal+' pallets en total';
 }
@@ -528,21 +576,21 @@ function enviar(){
   var d=new Date();
   var dias=['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
   var mes=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  var secs={0:{l:'CAMISETAS',r:[]},1:{l:'RESIDUOS',r:[]},2:{l:'LAMINA',r:[]}};
-  var totalPal=0;
-  for(var k=0;k<ks.length;k++){
-    var key=ks[k],qty=Q[key],id,vn=null;
-    if(key.indexOf('|')>=0){var p=key.indexOf('|');id=parseInt(key.substring(0,p));vn=key.substring(p+1);}
-    else id=parseInt(key);
-    var t=D[id][2];
-    totalPal+=qty;
-    var nm=vn?vn+' ('+document.querySelector('#p'+id+' .pn').textContent.split(' ')[0]+')':document.querySelector('#p'+id+' .pn').textContent;
-    secs[t].r.push('\u2022 '+nm+': *'+qty+' pal*');
-  }
+  var b=buildItems(),secs=b.secs,ord=b.ord,totalPal=b.totalPal;
+  var seclabels={0:'CAMISETAS',1:'RESIDUOS',2:'LAMINA'};
   var msg='*PEDIDO FENIX*\n';
   msg+=dias[d.getDay()]+' '+d.getDate()+' '+mes[d.getMonth()]+' \u2022 '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+'\n';
   msg+=nom+'\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\n';
-  for(var t=0;t<3;t++){if(secs[t].r.length) msg+='*'+secs[t].l+'*\n'+secs[t].r.join('\n')+'\n\n';}
+  for(var t=0;t<3;t++){
+    if(!ord[t].length) continue;
+    msg+='*'+seclabels[t]+'*\n';
+    for(var ci=0;ci<ord[t].length;ci++){
+      var cat=ord[t][ci],items=secs[t].cats[cat];
+      if(cat) msg+='_'+cat+'_\n';
+      for(var r=0;r<items.length;r++) msg+='\u2022 '+items[r].nm+': *'+items[r].qty+' pal*\n';
+    }
+    msg+='\n';
+  }
   msg+='\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n*'+totalPal+' pallets en total*';
   var a=document.createElement('a');
   a.href='https://wa.me/?text='+encodeURIComponent(msg);
@@ -557,24 +605,18 @@ function verPDF(){
   var d=new Date();
   var dias=['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];
   var mes=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  var secs={0:{l:'CAMISETAS',r:[]},1:{l:'RESIDUOS',r:[]},2:{l:'LAMINA / ARRANQUE',r:[]}};
-  var totalPal=0;
-  for(var k=0;k<ks.length;k++){
-    var key=ks[k],qty=Q[key],id,vn=null;
-    if(key.indexOf('|')>=0){var p=key.indexOf('|');id=parseInt(key.substring(0,p));vn=key.substring(p+1);}
-    else id=parseInt(key);
-    var t=D[id][2];
-    totalPal+=qty;
-    var nm=vn?vn+' ('+document.querySelector('#p'+id+' .pn').textContent.split(' ')[0]+')':document.querySelector('#p'+id+' .pn').textContent;
-    secs[t].r.push([nm,qty]);
-  }
+  var b=buildItems(),secs=b.secs,ord=b.ord,totalPal=b.totalPal;
+  var seclabels={0:'CAMISETAS',1:'RESIDUOS',2:'LAMINA / ARRANQUE'};
   var rows='';
   for(var t=0;t<3;t++){
-    if(!secs[t].r.length) continue;
-    rows+='<tr style="background:#1a3a5c;color:#fff"><td colspan="4" style="padding:8px 10px;font-weight:800">'+secs[t].l+'</td></tr>';
-    for(var r=0;r<secs[t].r.length;r++){
-      var row=secs[t].r[r];
-      rows+='<tr><td style="padding:8px 10px">'+row[0]+'</td><td style="padding:8px 10px;text-align:center">'+row[1]+' pal</td></tr>';
+    if(!ord[t].length) continue;
+    rows+='<tr style="background:#1a3a5c;color:#fff"><td colspan="2" style="padding:8px 10px;font-weight:800">'+seclabels[t]+'</td></tr>';
+    for(var ci=0;ci<ord[t].length;ci++){
+      var cat=ord[t][ci],items=secs[t].cats[cat];
+      if(cat) rows+='<tr style="background:#ddeeff"><td colspan="2" style="padding:5px 10px;font-size:11px;font-weight:800;color:#1a3a5c;text-transform:uppercase;letter-spacing:0.5px">'+cat+'</td></tr>';
+      for(var r=0;r<items.length;r++){
+        rows+='<tr><td style="padding:8px 10px">'+items[r].nm+'</td><td style="padding:8px 10px;text-align:center">'+items[r].qty+' pal</td></tr>';
+      }
     }
   }
   var html='<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Pedido Fenix</title>'
