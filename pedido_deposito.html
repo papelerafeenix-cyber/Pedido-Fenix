@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pedido Fenix</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f0f2f5;-webkit-text-size-adjust:100%}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer;user-select:none;-webkit-user-select:none}
+
+.hdr{background:#1a3a5c;color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.htitle{font-size:17px;font-weight:800}
+.hsubt{font-size:12px;color:#7fb8f0;margin-top:2px}
+.btnped{background:#25D366;border:none;color:#fff;padding:10px 14px;border-radius:10px;font-size:15px;font-weight:800;display:flex;align-items:center;gap:6px}
+.btnped:active{background:#1da355}
+.bdg{background:#e00;color:#fff;border-radius:12px;padding:1px 7px;font-size:12px;display:none}
+
+.bar{background:#fff;padding:8px 12px;border-bottom:1px solid #e0e0e0}
+.bar input{width:100%;padding:10px 12px;border:2px solid #ccc;border-radius:10px;font-size:16px;background:#fff;-webkit-appearance:none}
+
+.tabs{display:flex;background:#fff;border-bottom:3px solid #eee;position:sticky;top:57px;z-index:90}
+.tab{flex:1;padding:12px 4px;text-align:center;font-size:13px;font-weight:800;color:#888;border-bottom:4px solid transparent}
+.tab.on{color:#1a3a5c;border-bottom-color:#1a3a5c}
+.tab:active{background:#f5f5f5}
+
+.sec{display:none;padding:8px 10px 130px}
+.sec.on{display:block}
+.cat{font-size:11px;font-weight:800;color:#aaa;text-transform:uppercase;padding:16px 4px 6px;letter-spacing:1px}
+
+.p{background:#fff;border-radius:12px;margin-bottom:8px;padding:14px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border-left:5px solid transparent}
+.p.on{background:#ddeeff;border-left-color:#1a3a5c}
+.pi{flex:1;min-width:0}
+.pn{font-size:19px;font-weight:800;line-height:1.3;color:#111}
+.pm{font-size:12px;color:#aaa;margin-top:3px}
+.vtag{display:inline-block;background:#e67e00;color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:1px 5px;margin-left:5px;vertical-align:middle}
+
+.pc{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.bm,.bp{width:52px;height:52px;border-radius:50%;border:none;font-size:30px;display:flex;align-items:center;justify-content:center;font-weight:300}
+.bm{background:#ddd;color:#555}
+.bm:active{background:#bbb}
+.bp{background:#1a3a5c;color:#fff}
+.bp:active{background:#0e2244}
+.pv{display:flex;flex-direction:column;align-items:center;min-width:44px}
+.pv-n{font-size:34px;font-weight:900;color:#1a3a5c;line-height:1}
+.pv-l{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:1px}
+
+/* VARIANT POPUP */
+.vov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;align-items:center;justify-content:center}
+.vpanel{background:#fff;border-radius:18px;padding:20px;width:90%;max-width:340px;max-height:80vh;overflow-y:auto}
+.vtit{font-size:14px;font-weight:800;color:#1a3a5c;margin-bottom:16px;line-height:1.3}
+.vopt{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0f0f0;gap:8px}
+.vopt:last-child{border-bottom:none}
+.voname{font-size:15px;font-weight:700;flex:1}
+.vocount{display:flex;align-items:center;gap:6px}
+.vocount .bm,.vocount .bp{width:40px;height:40px;font-size:22px}
+.vocount b{width:28px;text-align:center;font-size:20px;font-weight:900;color:#1a3a5c}
+.vdone{width:100%;padding:14px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;margin-top:14px}
+.vdone:active{background:#1da355}
+
+/* CART OVERLAY */
+.ovl{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:flex-end}
+.ovl.on{display:flex}
+.panel{background:#fff;width:100%;max-height:86vh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden}
+.ptop{background:#1a3a5c;color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.ptop h2{font-size:18px;font-weight:800}
+.xbtn{background:none;border:none;color:#fff;font-size:32px;line-height:1;padding:0 4px}
+.pbody{flex:1;overflow-y:auto;padding:8px 16px}
+.slbl{font-size:11px;font-weight:800;color:#bbb;text-transform:uppercase;padding:12px 0 5px;letter-spacing:1px}
+.ir{padding:12px 0;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.irn{font-size:16px;font-weight:800;flex:1}
+.irq{font-size:28px;font-weight:900;color:#1a3a5c;white-space:nowrap}
+.irql{font-size:11px;color:#aaa;text-align:right;margin-top:1px}
+.vacio{text-align:center;color:#ccc;padding:50px;font-size:16px}
+.ppie{padding:14px 16px;border-top:2px solid #eee;flex-shrink:0}
+.ptotal{font-size:19px;font-weight:900;display:flex;justify-content:space-between;margin-bottom:12px}
+.btn-wa{width:100%;padding:16px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:17px;font-weight:800;margin-bottom:8px}
+.btn-wa:active{background:#1da355}
+.btn-pdf{width:100%;padding:14px;background:#1a3a5c;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;margin-bottom:8px}
+.btn-pdf:active{background:#0e2244}
+.btn-del{width:100%;padding:12px;background:none;color:#e00;border:2px solid #e00;border-radius:10px;font-size:15px;font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div><div class="htitle">Pedido Deposito</div><div class="hsubt" id="hsubt">0 pallets · $0</div></div>
+  <button class="btnped" data-a="panel">Pedido <span class="bdg" id="bdg">0</span></button>
+</div>
+
+<div class="bar"><input id="nom" type="text" placeholder="Nombre del empleado..." autocomplete="off"></div>
+<div class="bar"><input id="srch" type="search" placeholder="&#128269; Buscar producto..." oninput="buscar()" autocomplete="off"></div>
+
+<div class="tabs">
+  <div class="tab on" data-a="tab" data-i="0">CAMISETAS</div>
+  <div class="tab"    data-a="tab" data-i="1">RESIDUOS</div>
+  <div class="tab"    data-a="tab" data-i="2">LAMINA</div>
+</div>
+
+<!-- ========== CAMISETAS ========== -->
+<div class="sec on" id="s0">
+<div class="cat">IMPRESAS OXI 30x40</div>
+<div class="p" id="p0" data-n="30x40 pandita verde capibag oxi"><div class="pi"><div class="pn">30x40 PANDITA VERDE / CAPIBAG OXI</div><div class="pm">54 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="0">−</button><span class="pv" id="v0"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="0">+</button></div></div>
+<div class="p" id="p1" data-n="30x40 gato aprobada carita corazon oxi"><div class="pi"><div class="pn">30x40 GATO / APROBADA / CARITA / CORAZON OXI</div><div class="pm">54 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="1">−</button><span class="pv" id="v1"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="1">+</button></div></div>
+
+<div class="cat">IMPRESAS OXI 40x50-60x80</div>
+<div class="p" id="p2" data-n="40x50 panda blanco bolsa negra oxi"><div class="pi"><div class="pn">40x50 PANDA BLANCO BOLSA NEGRA OXI</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="2">−</button><span class="pv" id="v2"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="2">+</button></div></div>
+<div class="p" id="p3" data-n="40x50 panda capibag oxi"><div class="pi"><div class="pn">40x50 PANDA / CAPIBAG OXI</div><div class="pm">52 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="3">−</button><span class="pv" id="v3"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="3">+</button></div></div>
+<div class="p" id="p4" data-n="40x50 aprobada ley oxi"><div class="pi"><div class="pn">40x50 APROBADA LEY OXI</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="4">−</button><span class="pv" id="v4"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="4">+</button></div></div>
+<div class="p" id="p5" data-n="40x50 carita corazon gato vamosarg oxi"><div class="pi"><div class="pn">40x50 CARITA / CORAZON / GATO / VAMOSARG OXI</div><div class="pm">52 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="5">−</button><span class="pv" id="v5"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="5">+</button></div></div>
+<div class="p" id="p6" data-n="45x60 aprobada ley carita oxi"><div class="pi"><div class="pn">45x60 APROBADA LEY / CARITA OXI</div><div class="pm">28 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="6">−</button><span class="pv" id="v6"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="6">+</button></div></div>
+<div class="p" id="p7" data-n="50x70 carita oxi"><div class="pi"><div class="pn">50x70 CARITA OXI</div><div class="pm">26 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="7">−</button><span class="pv" id="v7"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="7">+</button></div></div>
+<div class="p" id="p8" data-n="50x70 aprobada ley oxi"><div class="pi"><div class="pn">50x70 APROBADA LEY OXI</div><div class="pm">26 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="8">−</button><span class="pv" id="v8"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="8">+</button></div></div>
+<div class="p" id="p9" data-n="60x80 aprobada ley oxi"><div class="pi"><div class="pn">60x80 APROBADA LEY OXI</div><div class="pm">26 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="9">−</button><span class="pv" id="v9"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="9">+</button></div></div>
+<div class="p" id="p10" data-n="60x80 carita oxi"><div class="pi"><div class="pn">60x80 CARITA OXI</div><div class="pm">26 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="10">−</button><span class="pv" id="v10"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="10">+</button></div></div>
+
+<div class="cat">CIUDAD VERDE/NEGRA IRAM</div>
+<div class="p" id="p11" data-n="40x50 ciudad negra nueva"><div class="pi"><div class="pn">40x50 CIUDAD NEGRA NUEVA</div><div class="pm">36 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="11">−</button><span class="pv" id="v11"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="11">+</button></div></div>
+<div class="p" id="p12" data-n="40x50 ciudad verde negra"><div class="pi"><div class="pn">40x50 CIUDAD VERDE / NEGRA</div><div class="pm">52 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="12">−</button><span class="pv" id="v12"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="12">+</button></div></div>
+<div class="p" id="p13" data-n="45x55 ciudad verde negra"><div class="pi"><div class="pn">45x55 CIUDAD VERDE / NEGRA</div><div class="pm">36 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="13">−</button><span class="pv" id="v13"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="13">+</button></div></div>
+<div class="p" id="p14" data-n="45x55 ciudad verde negra economica"><div class="pi"><div class="pn">45x55 CIUDAD VERDE / NEGRA ECONOMICA</div><div class="pm">36 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="14">−</button><span class="pv" id="v14"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="14">+</button></div></div>
+<div class="p" id="p15" data-n="55x60 ciudad verde negra"><div class="pi"><div class="pn">55x60 CIUDAD VERDE / NEGRA</div><div class="pm">36 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="15">−</button><span class="pv" id="v15"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="15">+</button></div></div>
+
+<div class="cat">TRANSPARENTE CRISTAL</div>
+<div class="p" id="p16" data-n="30x40 transparente cristal alta"><div class="pi"><div class="pn">30x40 TRANSPARENTE CRISTAL ALTA</div><div class="pm">54 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="16">−</button><span class="pv" id="v16"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="16">+</button></div></div>
+<div class="p" id="p17" data-n="40x50 transparente cristal alta"><div class="pi"><div class="pn">40x50 TRANSPARENTE CRISTAL ALTA</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="17">−</button><span class="pv" id="v17"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="17">+</button></div></div>
+<div class="p" id="p18" data-n="45x60 transparente cristal alta"><div class="pi"><div class="pn">45x60 TRANSPARENTE CRISTAL ALTA</div><div class="pm">28 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="18">−</button><span class="pv" id="v18"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="18">+</button></div></div>
+
+<div class="cat">LISAS 20x30 / 30x40</div>
+<div class="p" id="p19" data-n="20x30 rolan"><div class="pi"><div class="pn">20x30 ROLAN</div><div class="pm">36 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="19">−</button><span class="pv" id="v19"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="19">+</button></div></div>
+<div class="p" id="p20" data-n="30x40 funda amarilla solcito"><div class="pi"><div class="pn">30x40 FUNDA AMARILLA / SOLCITO</div><div class="pm">54 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="20">−</button><span class="pv" id="v20"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="20">+</button></div></div>
+<div class="p" id="p21" data-n="30x40 funda practibag"><div class="pi"><div class="pn">30x40 FUNDA PRACTIBAG</div><div class="pm">54 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="21">−</button><span class="pv" id="v21"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="21">+</button></div></div>
+<div class="p" id="p22" data-n="30x40 uvita"><div class="pi"><div class="pn">30x40 UVITA</div><div class="pm">54 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="22">−</button><span class="pv" id="v22"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="22">+</button></div></div>
+<div class="p" id="p23" data-n="30x40 funda naranja"><div class="pi"><div class="pn">30x40 FUNDA NARANJA</div><div class="pm">54 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="23">−</button><span class="pv" id="v23"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="23">+</button></div></div>
+<div class="p" id="p24" data-n="30x40 funda azul"><div class="pi"><div class="pn">30x40 FUNDA AZUL</div><div class="pm">54 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="24">−</button><span class="pv" id="v24"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="24">+</button></div></div>
+<div class="p" id="p25" data-n="30x40 funda roja"><div class="pi"><div class="pn">30x40 FUNDA ROJA</div><div class="pm">20 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="25">−</button><span class="pv" id="v25"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="25">+</button></div></div>
+
+<div class="cat">LISAS 40x50</div>
+<div class="p" id="p26" data-n="40x50 funda roja nueva"><div class="pi"><div class="pn">40x50 FUNDA ROJA NUEVA</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="26">−</button><span class="pv" id="v26"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="26">+</button></div></div>
+<div class="p" id="p27" data-n="40x50 funda amarilla sol uva"><div class="pi"><div class="pn">40x50 FUNDA AMARILLA / SOL / UVA</div><div class="pm">52 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="27">−</button><span class="pv" id="v27"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="27">+</button></div></div>
+<div class="p" id="p28" data-n="40x50 funda practibag"><div class="pi"><div class="pn">40x50 FUNDA PRACTIBAG</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="28">−</button><span class="pv" id="v28"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="28">+</button></div></div>
+<div class="p" id="p29" data-n="40x50 funda naranja"><div class="pi"><div class="pn">40x50 FUNDA NARANJA</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="29">−</button><span class="pv" id="v29"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="29">+</button></div></div>
+<div class="p" id="p30" data-n="40x50 funda esteban original rolan"><div class="pi"><div class="pn">40x50 FUNDA ESTEBAN ORIGINAL ROLAN</div><div class="pm">48 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="30">−</button><span class="pv" id="v30"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="30">+</button></div></div>
+<div class="p" id="p31" data-n="40x50 funda azul"><div class="pi"><div class="pn">40x50 FUNDA AZUL</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="31">−</button><span class="pv" id="v31"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="31">+</button></div></div>
+<div class="p" id="p32" data-n="40x50 funda tiburon blanco virgen nueva"><div class="pi"><div class="pn">40x50 FUNDA TIBURON BLANCO VIRGEN NUEVA</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="32">−</button><span class="pv" id="v32"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="32">+</button></div></div>
+<div class="p" id="p33" data-n="40x50 funda chen rolan"><div class="pi"><div class="pn">40x50 FUNDA CHEN ROLAN</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="33">−</button><span class="pv" id="v33"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="33">+</button></div></div>
+<div class="p" id="p34" data-n="40x50 funda verde"><div class="pi"><div class="pn">40x50 FUNDA VERDE</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="34">−</button><span class="pv" id="v34"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="34">+</button></div></div>
+<div class="p" id="p35" data-n="40x50 funda sustentable"><div class="pi"><div class="pn">40x50 FUNDA SUSTENTABLE</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="35">−</button><span class="pv" id="v35"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="35">+</button></div></div>
+
+<div class="cat">LISAS 45x60 / 50x70 / 60x80</div>
+<div class="p" id="p36" data-n="45x60 funda amarilla"><div class="pi"><div class="pn">45x60 FUNDA AMARILLA</div><div class="pm">28 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="36">−</button><span class="pv" id="v36"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="36">+</button></div></div>
+<div class="p" id="p37" data-n="45x60 funda practibag"><div class="pi"><div class="pn">45x60 FUNDA PRACTIBAG</div><div class="pm">28 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="37">−</button><span class="pv" id="v37"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="37">+</button></div></div>
+<div class="p" id="p38" data-n="45x60 funda naranja"><div class="pi"><div class="pn">45x60 FUNDA NARANJA</div><div class="pm">28 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="38">−</button><span class="pv" id="v38"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="38">+</button></div></div>
+<div class="p" id="p39" data-n="45x60 funda azul"><div class="pi"><div class="pn">45x60 FUNDA AZUL</div><div class="pm">28 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="39">−</button><span class="pv" id="v39"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="39">+</button></div></div>
+<div class="p" id="p40" data-n="50x50 reforzada"><div class="pi"><div class="pn">50x50 REFORZADA</div><div class="pm">22 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="40">−</button><span class="pv" id="v40"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="40">+</button></div></div>
+<div class="p" id="p41" data-n="50x60 reforzada"><div class="pi"><div class="pn">50x60 REFORZADA</div><div class="pm">24 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="41">−</button><span class="pv" id="v41"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="41">+</button></div></div>
+<div class="p" id="p42" data-n="50x70 funda amarilla"><div class="pi"><div class="pn">50x70 FUNDA AMARILLA</div><div class="pm">26 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="42">−</button><span class="pv" id="v42"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="42">+</button></div></div>
+<div class="p" id="p43" data-n="50x70 reforzada"><div class="pi"><div class="pn">50x70 REFORZADA</div><div class="pm">26 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="43">−</button><span class="pv" id="v43"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="43">+</button></div></div>
+<div class="p" id="p44" data-n="60x80 funda amarilla"><div class="pi"><div class="pn">60x80 FUNDA AMARILLA</div><div class="pm">26 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="44">−</button><span class="pv" id="v44"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="44">+</button></div></div>
+<div class="p" id="p45" data-n="60x80 reforzada"><div class="pi"><div class="pn">60x80 REFORZADA</div><div class="pm">26 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="45">−</button><span class="pv" id="v45"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="45">+</button></div></div>
+
+<div class="cat">RAYADAS</div>
+<div class="p" id="p46" data-n="30x40 rayada naranjita"><div class="pi"><div class="pn">30x40 RAYADA NARANJITA</div><div class="pm">54 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="46">−</button><span class="pv" id="v46"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="46">+</button></div></div>
+<div class="p" id="p47" data-n="40x50 cebra nueva"><div class="pi"><div class="pn">40x50 CEBRA NUEVA</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="47">−</button><span class="pv" id="v47"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="47">+</button></div></div>
+<div class="p" id="p48" data-n="40x50 rayada celeste"><div class="pi"><div class="pn">40x50 RAYADA CELESTE</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="48">−</button><span class="pv" id="v48"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="48">+</button></div></div>
+<div class="p" id="p49" data-n="45x60 rayada verde"><div class="pi"><div class="pn">45x60 RAYADA VERDE</div><div class="pm">28 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="49">−</button><span class="pv" id="v49"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="49">+</button></div></div>
+<div class="p" id="p50" data-n="50x70 rayada amarilla"><div class="pi"><div class="pn">50x70 RAYADA AMARILLA</div><div class="pm">26 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="50">−</button><span class="pv" id="v50"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="50">+</button></div></div>
+<div class="p" id="p51" data-n="60x80 rayada celeste"><div class="pi"><div class="pn">60x80 RAYADA CELESTE</div><div class="pm">26 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="51">−</button><span class="pv" id="v51"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="51">+</button></div></div>
+
+<div class="cat">PERLA NEGRA</div>
+<div class="p" id="p52" data-n="30x40 perla negra"><div class="pi"><div class="pn">30x40 PERLA NEGRA</div><div class="pm">54 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="52">−</button><span class="pv" id="v52"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="52">+</button></div></div>
+<div class="p" id="p53" data-n="40x50 perla negra"><div class="pi"><div class="pn">40x50 PERLA NEGRA</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="53">−</button><span class="pv" id="v53"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="53">+</button></div></div>
+<div class="p" id="p54" data-n="45x60 perla negra"><div class="pi"><div class="pn">45x60 PERLA NEGRA</div><div class="pm">28 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="54">−</button><span class="pv" id="v54"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="54">+</button></div></div>
+<div class="p" id="p55" data-n="50x70 perla negra"><div class="pi"><div class="pn">50x70 PERLA NEGRA</div><div class="pm">26 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="55">−</button><span class="pv" id="v55"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="55">+</button></div></div>
+<div class="p" id="p56" data-n="60x80 perla negra"><div class="pi"><div class="pn">60x80 PERLA NEGRA</div><div class="pm">26 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="56">−</button><span class="pv" id="v56"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="56">+</button></div></div>
+
+<div class="cat">TIBURON LILA</div>
+<div class="p" id="p57" data-n="30x40 tiburon lila virgen cal 2500"><div class="pi"><div class="pn">30x40 TIBURON LILA VIRGEN cal.2500</div><div class="pm">54 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="57">−</button><span class="pv" id="v57"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="57">+</button></div></div>
+<div class="p" id="p58" data-n="30x40 tiburon lila virgen cal 2800"><div class="pi"><div class="pn">30x40 TIBURON LILA VIRGEN cal.2800</div><div class="pm">54 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="58">−</button><span class="pv" id="v58"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="58">+</button></div></div>
+<div class="p" id="p59" data-n="40x50 tiburon lila virgen cal 4900"><div class="pi"><div class="pn">40x50 TIBURON LILA VIRGEN cal.4900</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="59">−</button><span class="pv" id="v59"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="59">+</button></div></div>
+<div class="p" id="p60" data-n="40x50 tiburon lila virgen cal 5340"><div class="pi"><div class="pn">40x50 TIBURON LILA VIRGEN cal.5340</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="60">−</button><span class="pv" id="v60"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="60">+</button></div></div>
+<div class="p" id="p61" data-n="40x50 tiburon lila impresa panda nueva"><div class="pi"><div class="pn">40x50 TIBURON LILA IMPRESA PANDA NUEVA</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="61">−</button><span class="pv" id="v61"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="61">+</button></div></div>
+<div class="p" id="p62" data-n="40x50 tiburon lila impresa carita nueva"><div class="pi"><div class="pn">40x50 TIBURON LILA IMPRESA CARITA NUEVA</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="62">−</button><span class="pv" id="v62"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="62">+</button></div></div>
+<div class="p" id="p63" data-n="40x50 tiburon lila virgen cal 9000"><div class="pi"><div class="pn">40x50 TIBURON LILA VIRGEN cal.9000</div><div class="pm">52 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="63">−</button><span class="pv" id="v63"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="63">+</button></div></div>
+<div class="p" id="p64" data-n="45x60 tiburon lila virgen cal 7600"><div class="pi"><div class="pn">45x60 TIBURON LILA VIRGEN cal.7600</div><div class="pm">28 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="64">−</button><span class="pv" id="v64"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="64">+</button></div></div>
+<div class="p" id="p65" data-n="45x60 tiburon lila virgen cal 8700"><div class="pi"><div class="pn">45x60 TIBURON LILA VIRGEN cal.8700</div><div class="pm">28 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="65">−</button><span class="pv" id="v65"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="65">+</button></div></div>
+<div class="p" id="p66" data-n="50x70 tiburon lila virgen"><div class="pi"><div class="pn">50x70 TIBURON LILA VIRGEN</div><div class="pm">26 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="66">−</button><span class="pv" id="v66"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="66">+</button></div></div>
+<div class="p" id="p67" data-n="60x80 tiburon lila virgen"><div class="pi"><div class="pn">60x80 TIBURON LILA VIRGEN</div><div class="pm">26 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="67">−</button><span class="pv" id="v67"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="67">+</button></div></div>
+</div>
+
+<!-- ========== RESIDUOS ========== -->
+<div class="sec" id="s1">
+<div class="cat">CAJA REFORZADA RESIDUOS BD</div>
+<div class="p" id="p68" data-n="45x60 10 bolsas negro ref"><div class="pi"><div class="pn">45x60 · 10 bolsas NEGRO REF.</div><div class="pm">92 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="68">−</button><span class="pv" id="v68"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="68">+</button></div></div>
+<div class="p" id="p69" data-n="50x70 10 bolsas negro ref"><div class="pi"><div class="pn">50x70 · 10 bolsas NEGRO REF.</div><div class="pm">72 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="69">−</button><span class="pv" id="v69"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="69">+</button></div></div>
+
+<div class="cat">CAJA REFORZADA CONSORCIO BD</div>
+<div class="p" id="p70" data-n="60x90 10 bolsas negro ref consorcio"><div class="pi"><div class="pn">60x90 · 10 bolsas NEGRO REF.</div><div class="pm">72 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="70">−</button><span class="pv" id="v70"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="70">+</button></div></div>
+<div class="p" id="p71" data-n="80x110 10 bolsas negro ref consorcio"><div class="pi"><div class="pn">80x110 · 10 bolsas NEGRO REF.</div><div class="pm">45 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="71">−</button><span class="pv" id="v71"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="71">+</button></div></div>
+
+<div class="cat">CAJA RESIDUOS BD</div>
+<div class="p" id="p72" data-n="45x60 20 bolsas verde residuos"><div class="pi"><div class="pn">45x60 · 20 bolsas VERDE</div><div class="pm">92 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="72">−</button><span class="pv" id="v72"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="72">+</button></div></div>
+<div class="p" id="p73" data-n="45x60 20 bolsas negro residuos"><div class="pi"><div class="pn">45x60 · 20 bolsas NEGRO</div><div class="pm">92 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="73">−</button><span class="pv" id="v73"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="73">+</button></div></div>
+<div class="p" id="p74" data-n="50x70 20 bolsas verde residuos"><div class="pi"><div class="pn">50x70 · 20 bolsas VERDE</div><div class="pm">72 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="74">−</button><span class="pv" id="v74"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="74">+</button></div></div>
+<div class="p" id="p75" data-n="50x70 20 bolsas negro residuos"><div class="pi"><div class="pn">50x70 · 20 bolsas NEGRO</div><div class="pm">72 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="75">−</button><span class="pv" id="v75"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="75">+</button></div></div>
+
+<div class="cat">CAJA CONSORCIOS BD</div>
+<div class="p" id="p76" data-n="60x90 10 bolsas verde consorcio"><div class="pi"><div class="pn">60x90 · 10 bolsas VERDE</div><div class="pm">72 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="76">−</button><span class="pv" id="v76"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="76">+</button></div></div>
+<div class="p" id="p77" data-n="60x90 10 bolsas blanco consorcio"><div class="pi"><div class="pn">60x90 · 10 bolsas BLANCO</div><div class="pm">72 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="77">−</button><span class="pv" id="v77"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="77">+</button></div></div>
+<div class="p" id="p78" data-n="60x90 10 bolsas negro consorcio"><div class="pi"><div class="pn">60x90 · 10 bolsas NEGRO</div><div class="pm">72 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="78">−</button><span class="pv" id="v78"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="78">+</button></div></div>
+<div class="p" id="p79" data-n="70x100 10 bolsas negro consorcio"><div class="pi"><div class="pn">70x100 · 10 bolsas NEGRO</div><div class="pm">45 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="79">−</button><span class="pv" id="v79"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="79">+</button></div></div>
+<div class="p" id="p80" data-n="80x110 10 bolsas negro consorcio"><div class="pi"><div class="pn">80x110 · 10 bolsas NEGRO</div><div class="pm">45 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="80">−</button><span class="pv" id="v80"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="80">+</button></div></div>
+<div class="p" id="p81" data-n="90x120 10 bolsas negro consorcio"><div class="pi"><div class="pn">90x120 · 10 bolsas NEGRO</div><div class="pm">45 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="81">−</button><span class="pv" id="v81"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="81">+</button></div></div>
+<div class="p" id="p82" data-n="100x130 10 bolsas negro consorcio"><div class="pi"><div class="pn">100x130 · 10 bolsas NEGRO</div><div class="pm">39 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="82">−</button><span class="pv" id="v82"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="82">+</button></div></div>
+
+<div class="cat">FREEZER / BAÑO / MASCOTA</div>
+<div class="p" id="p83" data-n="34x38 freezer transparente cristal 20 bolsas"><div class="pi"><div class="pn">34x38 FREEZER TRANSPARENTE CRISTAL · 20 bolsas</div><div class="pm">72 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="83">−</button><span class="pv" id="v83"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="83">+</button></div></div>
+<div class="p" id="p84" data-n="34x38 mascota negra perfume limon 20 bolsas"><div class="pi"><div class="pn">34x38 MASCOTA NEGRA PERFUME LIMON · 20 bolsas</div><div class="pm">72 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="84">−</button><span class="pv" id="v84"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="84">+</button></div></div>
+<div class="p" id="p85" data-n="34x38 bano blanca perfume frutilla 20 bolsas"><div class="pi"><div class="pn">34x38 BAÑO BLANCA PERFUME FRUTILLA · 20 bolsas</div><div class="pm">72 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="85">−</button><span class="pv" id="v85"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="85">+</button></div></div>
+
+<div class="cat">BULTO RESIDUOS BD</div>
+<div class="p" id="p86" data-n="45x60 20 bolsas verde bulto"><div class="pi"><div class="pn">45x60 · 20 bolsas VERDE</div><div class="pm">33 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="86">−</button><span class="pv" id="v86"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="86">+</button></div></div>
+<div class="p" id="p87" data-n="45x60 20 bolsas negro bulto"><div class="pi"><div class="pn">45x60 · 20 bolsas NEGRO</div><div class="pm">33 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="87">−</button><span class="pv" id="v87"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="87">+</button></div></div>
+<div class="p" id="p88" data-n="50x70 20 bolsas verde bulto"><div class="pi"><div class="pn">50x70 · 20 bolsas VERDE</div><div class="pm">33 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="88">−</button><span class="pv" id="v88"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="88">+</button></div></div>
+<div class="p" id="p89" data-n="50x70 20 bolsas negro bulto"><div class="pi"><div class="pn">50x70 · 20 bolsas NEGRO</div><div class="pm">33 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="89">−</button><span class="pv" id="v89"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="89">+</button></div></div>
+
+<div class="cat">BULTO CONSORCIOS BD</div>
+<div class="p" id="p90" data-n="60x90 10 bolsas verde bulto consorcio"><div class="pi"><div class="pn">60x90 · 10 bolsas VERDE</div><div class="pm">33 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="90">−</button><span class="pv" id="v90"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="90">+</button></div></div>
+<div class="p" id="p91" data-n="60x90 10 bolsas negro bulto consorcio"><div class="pi"><div class="pn">60x90 · 10 bolsas NEGRO</div><div class="pm">33 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="91">−</button><span class="pv" id="v91"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="91">+</button></div></div>
+<div class="p" id="p92" data-n="80x110 10 bolsas negro bulto consorcio"><div class="pi"><div class="pn">80x110 · 10 bolsas NEGRO</div><div class="pm">39 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="92">−</button><span class="pv" id="v92"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="92">+</button></div></div>
+<div class="p" id="p93" data-n="90x120 10 bolsas negro bulto consorcio"><div class="pi"><div class="pn">90x120 · 10 bolsas NEGRO</div><div class="pm">39 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="93">−</button><span class="pv" id="v93"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="93">+</button></div></div>
+<div class="p" id="p94" data-n="100x130 10 bolsas negro bulto consorcio"><div class="pi"><div class="pn">100x130 · 10 bolsas NEGRO</div><div class="pm">33 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="94">−</button><span class="pv" id="v94"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="94">+</button></div></div>
+
+<div class="cat">COMPACTERAS</div>
+<div class="p" id="p95" data-n="60x90 compactera 10kg 200 bolsas"><div class="pi"><div class="pn">60x90 COMPACTERA 10KG · 200 bolsas</div><div class="pm">30 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="95">−</button><span class="pv" id="v95"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="95">+</button></div></div>
+<div class="p" id="p96" data-n="70x100 compactera 10kg 150 bolsas"><div class="pi"><div class="pn">70x100 COMPACTERA 10KG · 150 bolsas</div><div class="pm">30 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="96">−</button><span class="pv" id="v96"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="96">+</button></div></div>
+<div class="p" id="p97" data-n="80x110 compactera 12kg 150 bolsas"><div class="pi"><div class="pn">80x110 COMPACTERA 12KG · 150 bolsas</div><div class="pm">30 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="97">−</button><span class="pv" id="v97"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="97">+</button></div></div>
+<div class="p" id="p98" data-n="90x120 compactera 10kg 100 bolsas"><div class="pi"><div class="pn">90x120 COMPACTERA 10KG · 100 bolsas</div><div class="pm">30 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="98">−</button><span class="pv" id="v98"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="98">+</button></div></div>
+</div>
+
+<!-- ========== LAMINA ========== -->
+<div class="sec" id="s2">
+<div class="cat">PEQUENO ALTA DENSIDAD</div>
+<div class="p" id="p99" data-n="15x20 15x25 pequeno alta densidad"><div class="pi"><div class="pn">15x20 / 15x25 · PEQUENO ALTA DENSIDAD</div><div class="pm">51 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="99">−</button><span class="pv" id="v99"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="99">+</button></div></div>
+
+<div class="cat">PEQUENO BAJA DENSIDAD</div>
+<div class="p" id="p100" data-n="10x20 10x25 15x20 15x25 pequeno baja densidad"><div class="pi"><div class="pn">10x20 / 10x25 / 15x20 / 15x25 · PEQUENO BAJA DENSIDAD</div><div class="pm">51 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="100">−</button><span class="pv" id="v100"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="100">+</button></div></div>
+
+<div class="cat">RENDIDOR FUNDA AZUL (virgen)</div>
+<div class="p" id="p101" data-n="20x30 rendidor azul"><div class="pi"><div class="pn">20x30 RENDIDOR AZUL</div><div class="pm">27 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="101">−</button><span class="pv" id="v101"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="101">+</button></div></div>
+<div class="p" id="p102" data-n="25x35 rendidor azul"><div class="pi"><div class="pn">25x35 RENDIDOR AZUL</div><div class="pm">36 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="102">−</button><span class="pv" id="v102"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="102">+</button></div></div>
+<div class="p" id="p103" data-n="30x40 rendidor azul"><div class="pi"><div class="pn">30x40 RENDIDOR AZUL</div><div class="pm">30 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="103">−</button><span class="pv" id="v103"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="103">+</button></div></div>
+<div class="p" id="p104" data-n="35x45 rendidor azul"><div class="pi"><div class="pn">35x45 RENDIDOR AZUL</div><div class="pm">24 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="104">−</button><span class="pv" id="v104"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="104">+</button></div></div>
+<div class="p" id="p105" data-n="40x50 rendidor azul"><div class="pi"><div class="pn">40x50 RENDIDOR AZUL</div><div class="pm">40 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="105">−</button><span class="pv" id="v105"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="105">+</button></div></div>
+
+<div class="cat">RENDIDOR FUNDA ROJA (original)</div>
+<div class="p" id="p106" data-n="15x20 rendidor roja"><div class="pi"><div class="pn">15x20 RENDIDOR ROJA</div><div class="pm">39 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="106">−</button><span class="pv" id="v106"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="106">+</button></div></div>
+<div class="p" id="p107" data-n="15x25 rendidor roja"><div class="pi"><div class="pn">15x25 RENDIDOR ROJA</div><div class="pm">39 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="107">−</button><span class="pv" id="v107"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="107">+</button></div></div>
+<div class="p" id="p108" data-n="20x25 rendidor roja"><div class="pi"><div class="pn">20x25 RENDIDOR ROJA</div><div class="pm">33 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="108">−</button><span class="pv" id="v108"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="108">+</button></div></div>
+<div class="p" id="p109" data-n="20x30 rendidor roja"><div class="pi"><div class="pn">20x30 RENDIDOR ROJA</div><div class="pm">27 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="109">−</button><span class="pv" id="v109"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="109">+</button></div></div>
+<div class="p" id="p110" data-n="25x35 rendidor roja"><div class="pi"><div class="pn">25x35 RENDIDOR ROJA</div><div class="pm">36 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="110">−</button><span class="pv" id="v110"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="110">+</button></div></div>
+<div class="p" id="p111" data-n="30x40 rendidor roja"><div class="pi"><div class="pn">30x40 RENDIDOR ROJA</div><div class="pm">30 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="111">−</button><span class="pv" id="v111"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="111">+</button></div></div>
+<div class="p" id="p112" data-n="35x45 rendidor roja"><div class="pi"><div class="pn">35x45 RENDIDOR ROJA</div><div class="pm">24 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="112">−</button><span class="pv" id="v112"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="112">+</button></div></div>
+<div class="p" id="p113" data-n="40x50 rendidor roja"><div class="pi"><div class="pn">40x50 RENDIDOR ROJA</div><div class="pm">40 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="113">−</button><span class="pv" id="v113"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="113">+</button></div></div>
+<div class="p" id="p114" data-n="40x60 rendidor roja"><div class="pi"><div class="pn">40x60 RENDIDOR ROJA</div><div class="pm">20 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="114">−</button><span class="pv" id="v114"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="114">+</button></div></div>
+<div class="p" id="p115" data-n="45x60 rendidor roja"><div class="pi"><div class="pn">45x60 RENDIDOR ROJA</div><div class="pm">20 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="115">−</button><span class="pv" id="v115"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="115">+</button></div></div>
+
+<div class="cat">RENDIDOR VIOLETA ALTA cal.8400</div>
+<div class="p" id="p116" data-n="violeta alta 20x30 30x40 35x45 40x50 40x60 45x60 50x70"><div class="pi"><div class="pn">VIOLETA ALTA · (varios tamaños)</div><div class="pm">30 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="116">−</button><span class="pv" id="v116"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="116">+</button></div></div>
+<div class="p" id="p117" data-n="25x35 violeta alta"><div class="pi"><div class="pn">25x35 VIOLETA ALTA</div><div class="pm">36 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="117">−</button><span class="pv" id="v117"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="117">+</button></div></div>
+
+<div class="cat">ARRANQUE SIN CONO cal.9000</div>
+<div class="p" id="p118" data-n="arranque sin cono 20x30 30x40 35x45 40x50 45x60 50x70"><div class="pi"><div class="pn">ARRANQUE SIN CONO · (varios tamaños)</div><div class="pm">30 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="118">−</button><span class="pv" id="v118"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="118">+</button></div></div>
+<div class="p" id="p119" data-n="25x35 arranque sin cono"><div class="pi"><div class="pn">25x35 ARRANQUE SIN CONO</div><div class="pm">36 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="119">−</button><span class="pv" id="v119"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="119">+</button></div></div>
+<div class="p" id="p120" data-n="60x90 arranque sin cono"><div class="pi"><div class="pn">60x90 ARRANQUE SIN CONO</div><div class="pm">25 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="120">−</button><span class="pv" id="v120"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="120">+</button></div></div>
+
+<div class="cat">RENDIDOR NARANJA BAJA cal.8400</div>
+<div class="p" id="p121" data-n="naranja baja 20x30 30x40 35x45 40x50 45x60 50x70"><div class="pi"><div class="pn">NARANJA BAJA · (varios tamaños)</div><div class="pm">30 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="121">−</button><span class="pv" id="v121"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="121">+</button></div></div>
+<div class="p" id="p122" data-n="25x35 naranja baja"><div class="pi"><div class="pn">25x35 NARANJA BAJA</div><div class="pm">36 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="122">−</button><span class="pv" id="v122"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="122">+</button></div></div>
+<div class="p" id="p123" data-n="60x90 naranja baja"><div class="pi"><div class="pn">60x90 NARANJA BAJA</div><div class="pm">25 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="123">−</button><span class="pv" id="v123"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="123">+</button></div></div>
+
+<div class="cat">LAMINA PAQUETE 1 KG</div>
+<div class="p" id="p124" data-n="lamina paquete 20x25 25x35 30x30 37x50"><div class="pi"><div class="pn">LAMINA PAQUETE · (varios tamaños)</div><div class="pm">36 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="124">−</button><span class="pv" id="v124"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="124">+</button></div></div>
+
+<div class="cat">LAMINA ECO PAQUETE 900g</div>
+<div class="p" id="p125" data-n="20x25 lamina eco funda azul"><div class="pi"><div class="pn">20x25 LAMINA ECO FUNDA AZUL</div><div class="pm">36 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="125">−</button><span class="pv" id="v125"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="125">+</button></div></div>
+
+<div class="cat">LAMINAS ROLLO 1 KG</div>
+<div class="p" id="p126" data-n="laminas rollo 20x25 25x35"><div class="pi"><div class="pn">LAMINAS ROLLO · 20x25 / 25x35</div><div class="pm">36 bult/pal<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="126">−</button><span class="pv" id="v126"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="126">+</button></div></div>
+<div class="p" id="p127" data-n="14x14 laminas rollo"><div class="pi"><div class="pn">14x14 LAMINAS ROLLO</div><div class="pm">36 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="127">−</button><span class="pv" id="v127"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="127">+</button></div></div>
+<div class="p" id="p128" data-n="18x18 laminas rollo"><div class="pi"><div class="pn">18x18 LAMINAS ROLLO</div><div class="pm">36 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="128">−</button><span class="pv" id="v128"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="128">+</button></div></div>
+</div>
+
+<!-- VARIANT POPUP -->
+<div class="vov" id="vov" onclick="if(event.target===this)cerrarVar()">
+  <div class="vpanel">
+    <div class="vtit" id="vtit"></div>
+    <div id="vopts"></div>
+    <button class="vdone" data-a="closevar">Listo</button>
+  </div>
+</div>
+
+<!-- CART PANEL -->
+<div class="ovl" id="ovl" onclick="if(event.target===this)cerrar()">
+  <div class="panel">
+    <div class="ptop"><h2>Tu Pedido</h2><button class="xbtn" data-a="close">×</button></div>
+    <div class="pbody" id="pbody"></div>
+    <div class="ppie">
+      <div class="ptotal"><span>TOTAL</span><span id="ptot">$0</span></div>
+      <button class="btn-wa" data-a="enviar">Enviar por WhatsApp</button>
+      <button class="btn-pdf" data-a="pdf">Ver / Imprimir PDF</button>
+      <button class="btn-del" data-a="borrar">Borrar pedido</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATOS ──────────────────────────────────────────────
+// D[i] = [bultos_por_pallet, precio_por_bulto, tab(0=cam,1=res,2=lam)]
+var D=[
+[54,25327,0],[54,28945,0],
+[52,36181,0],[52,56985,0],[52,61508,0],[52,65126,0],[28,81408,0],[26,45227,0],[26,54272,0],[26,40704,0],[26,49749,0],
+[36,36181,0],[52,63317,0],[36,63317,0],[36,54272,0],[36,90453,0],
+[54,28945,0],[52,61508,0],[28,81408,0],
+[36,38214,0],[54,22613,0],[54,25146,0],[54,25327,0],[54,28945,0],[54,36181,0],[20,90453,0],
+[52,36181,0],[52,44322,0],[52,49026,0],[52,54272,0],[48,58794,0],[52,61508,0],[52,65126,0],[52,66935,0],[52,68744,0],[52,81408,0],
+[28,63317,0],[28,75076,0],[28,81408,0],[28,94976,0],[22,72362,0],[24,90453,0],[26,45227,0],[26,54272,0],[26,40704,0],[26,49749,0],
+[54,25327,0],[52,36181,0],[52,61508,0],[28,81408,0],[26,45227,0],[26,45227,0],
+[54,21549,0],[52,38788,0],[28,56889,0],[26,82748,0],[26,56889,0],
+[54,21549,0],[54,24135,0],[52,42236,0],[52,46029,0],[52,56985,0],[52,65126,0],[52,77576,0],[28,65509,0],[28,74991,0],[26,43098,0],[26,43098,0],
+[92,11570,1],[72,16348,1],[72,17103,1],[45,30936,1],
+[92,16298,1],[92,16298,1],[72,21127,1],[72,21127,1],
+[72,20867,1],[72,32493,1],[72,20867,1],[45,34701,1],[45,35264,1],[45,41829,1],[39,54490,1],
+[72,29043,1],[72,29043,1],[72,29043,1],
+[33,33703,1],[33,33703,1],[33,43764,1],[33,43764,1],
+[33,43142,1],[33,43142,1],[39,44079,1],[39,51582,1],[33,67526,1],
+[30,41701,1],[30,41701,1],[30,50041,1],[30,41701,1],
+[51,27380,2],[51,29297,2],
+[27,54272,2],[36,54272,2],[30,45227,2],[24,54272,2],[40,39799,2],
+[39,29307,2],[39,36181,2],[33,50835,2],[27,63317,2],[36,61508,2],[30,54272,2],[24,61508,2],[40,47850,2],[20,54272,2],[20,59699,2],
+[30,75981,2],[36,75981,2],
+[30,81408,2],[36,81408,2],[25,81408,2],
+[30,80074,2],[36,80074,2],[25,80074,2],
+[36,82236,2],[36,74012,2],[36,82236,2],[36,95535,2],[36,95535,2]
+];
+
+// Variantes por producto: { id: ["opcion1","opcion2",...] }
+var V={
+  0:["PANDITA VERDE","CAPIBAG"],
+  1:["GATO","APROBADA","CARITA","CORAZON"],
+  3:["PANDA","CAPIBAG"],
+  5:["CARITA","CORAZON","GATO","VAMOSARG"],
+  6:["APROBADA LEY","CARITA"],
+  12:["VERDE","NEGRA"],
+  13:["VERDE","NEGRA"],
+  14:["VERDE","NEGRA ECONOMICA"],
+  15:["VERDE","NEGRA"],
+  20:["AMARILLA","SOLCITO"],
+  27:["AMARILLA","SOL","UVA"],
+  99:["15x20","15x25"],
+  100:["10x20","10x25","15x20","15x25"],
+  116:["20x30","30x40","35x45","40x50","40x60","45x60","50x70"],
+  118:["20x30","30x40","35x45","40x50","45x60","50x70"],
+  121:["20x30","30x40","35x45","40x50","45x60","50x70"],
+  124:["20x25","25x35","30x30","37x50"],
+  126:["20x25","25x35"]
+};
+
+// Q: clave="id" para simples, "id|variante" para variantes
+var Q={};
+var tabActual=0;
+var varId=null;
+
+// ── CORE ──────────────────────────────────────────────
+function q(id,d){
+  if(V[id]){
+    if(d>0){abrirVar(id);return;}
+    // resta: si hay una sola variante activa la resta directo
+    var vs=V[id],act=[];
+    for(var i=0;i<vs.length;i++) if((Q[id+'|'+vs[i]]||0)>0) act.push(vs[i]);
+    if(!act.length) return;
+    if(act.length===1){qv(id,act[0],-1);return;}
+    abrirVar(id); return;
+  }
+  var n=Math.max(0,(Q[id]||0)+d);
+  if(n===0) delete Q[id]; else Q[id]=n;
+  updRow(id); updHdr();
+}
+
+function qv(id,v,d){
+  var k=id+'|'+v;
+  var n=Math.max(0,(Q[k]||0)+d);
+  if(n===0) delete Q[k]; else Q[k]=n;
+  // actualizar popup si está abierto
+  if(varId===id){
+    var vs=V[id];
+    for(var i=0;i<vs.length;i++){
+      if(vs[i]===v){var el=document.getElementById('vv'+id+'_'+i);if(el)el.textContent=n;break;}
+    }
+  }
+  updRow(id); updHdr();
+}
+
+function totProd(id){
+  if(!V[id]) return Q[id]||0;
+  var t=0,vs=V[id];
+  for(var i=0;i<vs.length;i++) t+=Q[id+'|'+vs[i]]||0;
+  return t;
+}
+
+function updRow(id){
+  var n=totProd(id);
+  var el=document.getElementById('v'+id);
+  if(el){var nn=el.querySelector('.pv-n');if(nn)nn.textContent=n;else el.textContent=n;}
+  var p=document.getElementById('p'+id);  if(p)  p.className='p'+(n>0?' on':'');
+}
+
+function updHdr(){
+  var tp=0,tc=0,ks=Object.keys(Q);
+  for(var k=0;k<ks.length;k++){
+    var key=ks[k],qty=Q[key];
+    var id=key.indexOf('|')>=0?parseInt(key):parseInt(key);
+    if(key.indexOf('|')>=0) id=parseInt(key.split('|')[0]);
+    if(D[id]){tp+=qty; tc+=qty*D[id][0]*D[id][1];}
+  }
+  document.getElementById('hsubt').textContent=tp+' pallet'+(tp!==1?'s':'')+' · '+fmt(tc);
+  var b=document.getElementById('bdg');
+  b.textContent=tp; b.style.display=tp>0?'inline':'none';
+}
+
+// ── TABS ──────────────────────────────────────────────
+function setTab(n){
+  tabActual=n;
+  var ts=document.querySelectorAll('.tab');
+  var ss=document.querySelectorAll('.sec');
+  for(var i=0;i<3;i++){ts[i].className='tab'+(i===n?' on':'');ss[i].className='sec'+(i===n?' on':'');}
+  document.getElementById('srch').value='';
+  var ps=document.querySelectorAll('.p');
+  for(var i=0;i<ps.length;i++) ps[i].style.display='';
+  var cats=document.querySelectorAll('.cat');
+  for(var i=0;i<cats.length;i++) cats[i].style.display='';
+  window.scrollTo(0,0);
+}
+
+// ── BUSCAR ────────────────────────────────────────────
+function buscar(){
+  var t=document.getElementById('srch').value.toLowerCase().trim();
+  var ss=document.querySelectorAll('.sec');
+  var ps=document.querySelectorAll('.p');
+  var cats=document.querySelectorAll('.cat');
+  if(!t){
+    for(var i=0;i<ss.length;i++) ss[i].className='sec'+(i===tabActual?' on':'');
+    for(var i=0;i<ps.length;i++) ps[i].style.display='';
+    for(var i=0;i<cats.length;i++) cats[i].style.display='';
+    return;
+  }
+  for(var i=0;i<ss.length;i++) ss[i].className='sec on';
+  for(var i=0;i<ps.length;i++){
+    var nm=(ps[i].dataset.n||'').toLowerCase();
+    ps[i].style.display=nm.indexOf(t)>=0?'':'none';
+  }
+  // ocultar categorias sin hijos visibles
+  for(var i=0;i<cats.length;i++){
+    var nx=cats[i].nextElementSibling,vis=false;
+    while(nx&&!nx.classList.contains('cat')){
+      if(nx.style.display!=='none'){vis=true;break;}
+      nx=nx.nextElementSibling;
+    }
+    cats[i].style.display=vis?'':'none';
+  }
+}
+
+// ── VARIANTES ─────────────────────────────────────────
+function abrirVar(id){
+  varId=id;
+  var nm=document.querySelector('#p'+id+' .pn').textContent;
+  document.getElementById('vtit').textContent=nm;
+  var vs=V[id],html='';
+  for(var i=0;i<vs.length;i++){
+    var v=vs[i],qty=Q[id+'|'+v]||0;
+    html+='<div class="vopt"><span class="voname">'+v+'</span>'
+      +'<div class="vocount">'
+      +'<button class="bm" data-a="qv" data-i="'+id+'" data-v="'+v+'" data-d="-1">−</button>'
+      +'<b id="vv'+id+'_'+i+'">'+qty+'</b>'
+      +'<button class="bp" data-a="qv" data-i="'+id+'" data-v="'+v+'" data-d="1">+</button>'
+      +'</div></div>';
+  }
+  document.getElementById('vopts').innerHTML=html;
+  document.getElementById('vov').style.display='flex';
+}
+function escQ(s){return s.replace(/'/g,"\\'");}
+function cerrarVar(){document.getElementById('vov').style.display='none';varId=null;}
+
+// ── CARRITO ───────────────────────────────────────────
+function abrirPanel(){renderCart();document.getElementById('ovl').className='ovl on';}
+function cerrar(){document.getElementById('ovl').className='ovl';}
+
+function renderCart(){
+  var ks=Object.keys(Q),body=document.getElementById('pbody');
+  if(!ks.length){
+    body.innerHTML='<div class="vacio">No hay productos.<br>Suma pallets desde la lista.</div>';
+    document.getElementById('ptot').innerHTML=''; return;
+  }
+  var secs={0:{l:'CAMISETAS',r:[]},1:{l:'RESIDUOS',r:[]},2:{l:'LAMINA / ARRANQUE',r:[]}};
+  var totalPal=0;
+  for(var k=0;k<ks.length;k++){
+    var key=ks[k],qty=Q[key],id,vn=null;
+    if(key.indexOf('|')>=0){var p=key.indexOf('|');id=parseInt(key.substring(0,p));vn=key.substring(p+1);}
+    else id=parseInt(key);
+    var t=D[id][2]; totalPal+=qty;
+    var nm=vn?vn+' ('+document.querySelector('#p'+id+' .pn').textContent.split(' ')[0]+')':document.querySelector('#p'+id+' .pn').textContent;
+    secs[t].r.push('<div class="ir"><div class="irn">'+nm+'</div><div><div class="irq">'+qty+'</div><div class="irql">pallets</div></div></div>');
+  }
+  var html='';
+  for(var t=0;t<3;t++){if(secs[t].r.length) html+='<div class="slbl">'+secs[t].l+'</div>'+secs[t].r.join('');}
+  body.innerHTML=html;
+  document.getElementById('ptot').innerHTML=totalPal+' pallets en total';
+}
+
+function borrar(){
+  Q={};
+  var ps=document.querySelectorAll('.p');
+  for(var i=0;i<ps.length;i++){ps[i].className='p';var vn=ps[i].querySelector('.pv-n');if(vn)vn.textContent='0';}
+  updHdr(); cerrar();
+}
+
+// ── ENVIAR WA ─────────────────────────────────────────
+function enviar(){
+  var ks=Object.keys(Q);
+  if(!ks.length){alert('No hay productos.');return;}
+  var nom=document.getElementById('nom').value.trim()||'sin nombre';
+  var d=new Date();
+  var dias=['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
+  var mes=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  var secs={0:{l:'CAMISETAS',r:[]},1:{l:'RESIDUOS',r:[]},2:{l:'LAMINA',r:[]}};
+  var totalPal=0;
+  for(var k=0;k<ks.length;k++){
+    var key=ks[k],qty=Q[key],id,vn=null;
+    if(key.indexOf('|')>=0){var p=key.indexOf('|');id=parseInt(key.substring(0,p));vn=key.substring(p+1);}
+    else id=parseInt(key);
+    var t=D[id][2];
+    totalPal+=qty;
+    var nm=vn?vn+' ('+document.querySelector('#p'+id+' .pn').textContent.split(' ')[0]+')':document.querySelector('#p'+id+' .pn').textContent;
+    secs[t].r.push('\u2022 '+nm+': *'+qty+' pal*');
+  }
+  var msg='*PEDIDO FENIX*\n';
+  msg+=dias[d.getDay()]+' '+d.getDate()+' '+mes[d.getMonth()]+' \u2022 '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+'\n';
+  msg+=nom+'\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\n';
+  for(var t=0;t<3;t++){if(secs[t].r.length) msg+='*'+secs[t].l+'*\n'+secs[t].r.join('\n')+'\n\n';}
+  msg+='\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n*'+totalPal+' pallets en total*';
+  var a=document.createElement('a');
+  a.href='https://wa.me/?text='+encodeURIComponent(msg);
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+// ── PDF ───────────────────────────────────────────────
+function verPDF(){
+  var ks=Object.keys(Q);
+  if(!ks.length){alert('No hay productos.');return;}
+  var nom=document.getElementById('nom').value.trim()||'sin nombre';
+  var d=new Date();
+  var dias=['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];
+  var mes=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var secs={0:{l:'CAMISETAS',r:[]},1:{l:'RESIDUOS',r:[]},2:{l:'LAMINA / ARRANQUE',r:[]}};
+  var total=0;
+  for(var k=0;k<ks.length;k++){
+    var key=ks[k],qty=Q[key],id,vn=null;
+    if(key.indexOf('|')>=0){var p=key.indexOf('|');id=parseInt(key.substring(0,p));vn=key.substring(p+1);}
+    else id=parseInt(key);
+    var pal=D[id][0],pr=D[id][1],t=D[id][2];
+    var bul=qty*pal,sub=bul*pr; total+=sub;
+    var nm=vn?vn+' ('+document.querySelector('#p'+id+' .pn').textContent.split(' ')[0]+')':document.querySelector('#p'+id+' .pn').textContent;
+    secs[t].r.push([nm,qty,bul,sub]);
+  }
+  var rows='';
+  for(var t=0;t<3;t++){
+    if(!secs[t].r.length) continue;
+    rows+='<tr style="background:#1a3a5c;color:#fff"><td colspan="4" style="padding:8px 10px;font-weight:800">'+secs[t].l+'</td></tr>';
+    for(var r=0;r<secs[t].r.length;r++){
+      var row=secs[t].r[r];
+      rows+='<tr><td style="padding:8px 10px">'+row[0]+'</td><td style="padding:8px 10px;text-align:center">'+row[1]+'</td><td style="padding:8px 10px;text-align:center">'+row[2]+'</td><td style="padding:8px 10px;text-align:right">'+fmt(row[3])+'</td></tr>';
+    }
+  }
+  var html='<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Pedido Fenix</title>'
+    +'<style>body{font-family:Arial,sans-serif;max-width:650px;margin:24px auto;padding:0 16px;color:#111}'
+    +'h1{color:#1a3a5c;font-size:22px;margin-bottom:2px}'
+    +'.sub{color:#666;font-size:14px;margin-bottom:20px}'
+    +'table{width:100%;border-collapse:collapse;font-size:14px}'
+    +'th{background:#eef2f7;color:#1a3a5c;padding:8px 10px;text-align:left;font-size:12px;text-transform:uppercase}'
+    +'tr:nth-child(even) td{background:#f9f9f9}'
+    +'.tot{text-align:right;font-size:20px;font-weight:800;color:#1a3a5c;padding:16px 0}'
+    +'@media print{.noPrint{display:none}}'
+    +'</style></head><body>'
+    +'<h1>Pedido Papelera Fenix</h1>'
+    +'<div class="sub">'+dias[d.getDay()]+', '+d.getDate()+' de '+mes[d.getMonth()]+' '+d.getFullYear()+'&nbsp;&nbsp;|&nbsp;&nbsp;Empleado: <b>'+nom+'</b></div>'
+    +'<table><tr><th>Producto</th><th style="text-align:center">Pallets</th><th style="text-align:center">Bultos</th><th style="text-align:right">Subtotal</th></tr>'
+    +rows+'</table>'
+    +'<div class="tot">TOTAL: '+fmt(total)+'</div>'
+    +'<button class="noPrint" onclick="window.print()" style="padding:12px 28px;background:#1a3a5c;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer">Imprimir / Guardar PDF</button>'
+    +'</body></html>';
+  var w=window.open('','_blank');
+  if(w){w.document.write(html);w.document.close();}
+  else alert('Permiti las ventanas emergentes para ver el PDF.');
+}
+
+// ── DISPATCHER GLOBAL ─────────────────────────────────
+// Un solo listener para TODOS los botones: más robusto en mobile
+document.addEventListener('click', function(e){
+  var t=e.target;
+  while(t && t!==document.body && !(t.dataset && t.dataset.a)) t=t.parentElement;
+  if(!t || !t.dataset || !t.dataset.a) return;
+  var a=t.dataset.a, i=parseInt(t.dataset.i);
+  if(a==='p')       { q(i,1); }
+  else if(a==='m')  { q(i,-1); }
+  else if(a==='tab'){ setTab(i); }
+  else if(a==='panel'){ abrirPanel(); }
+  else if(a==='close'){ cerrar(); }
+  else if(a==='borrar'){ borrar(); }
+  else if(a==='enviar'){ enviar(); }
+  else if(a==='pdf')  { verPDF(); }
+  else if(a==='closevar'){ cerrarVar(); }
+  else if(a==='qv')   { qv(parseInt(t.dataset.i), t.dataset.v, parseInt(t.dataset.d)); }
+});
+
+// ── UTIL ──────────────────────────────────────────────
+function fmt(n){
+  var s=''+Math.round(n),o='',c=0;
+  for(var i=s.length-1;i>=0;i--){if(c>0&&c%3===0)o='.'+o;o=s[i]+o;c++;}
+  return '$'+o;
+}
+</script>
+</body>
+</html>
