@@ -296,6 +296,12 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:
 <div class="p" id="p128" data-n="18x18 laminas rollo"><div class="pi"><div class="pn">18x18 LAMINAS ROLLO</div><div class="pm">36 bult/pal</div></div><div class="pc"><button class="bm" data-a="m" data-i="128">−</button><span class="pv" id="v128"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="128">+</button></div></div>
 </div>
 
+
+<div class="cat">ROLLO ARRANQUE</div>
+<div class="p" id="p129" data-n="arranque 1.5 kg 1500 rollo arranque"><div class="pi"><div class="pn">ARRANQUE 1.5 KG</div><div class="pm">rollo<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="129">−</button><span class="pv" id="v129"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="129">+</button></div></div>
+<div class="p" id="p130" data-n="arranque 750 gramos rollo arranque"><div class="pi"><div class="pn">ARRANQUE 750g</div><div class="pm">rollo<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="130">−</button><span class="pv" id="v130"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="130">+</button></div></div>
+<div class="p" id="p131" data-n="estrella 1.3 kg 1300 rollo arranque"><div class="pi"><div class="pn">ESTRELLA 1.3 KG</div><div class="pm">rollo<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="131">−</button><span class="pv" id="v131"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="131">+</button></div></div>
+<div class="p" id="p132" data-n="estrellita 650 gramos rollo arranque"><div class="pi"><div class="pn">ESTRELLITA 650g</div><div class="pm">rollo<span class="vtag">ELEGIR</span></div></div><div class="pc"><button class="bm" data-a="m" data-i="132">−</button><span class="pv" id="v132"><span class="pv-n">0</span><span class="pv-l">pal</span></span><button class="bp" data-a="p" data-i="132">+</button></div></div>
 <!-- VARIANT POPUP -->
 <div class="vov" id="vov" onclick="if(event.target===this)cerrarVar()">
   <div class="vpanel">
@@ -346,7 +352,8 @@ var D=[
 [30,75981,2],[36,75981,2],
 [30,81408,2],[36,81408,2],[25,81408,2],
 [30,80074,2],[36,80074,2],[25,80074,2],
-[36,82236,2],[36,74012,2],[36,82236,2],[36,95535,2],[36,95535,2]
+[36,82236,2],[36,74012,2],[36,82236,2],[36,95535,2],[36,95535,2],
+[1,0,2],[1,0,2],[1,0,2],[1,0,2]
 ];
 
 // Variantes por producto: { id: ["opcion1","opcion2",...] }
@@ -368,7 +375,11 @@ var V={
   118:["20x30","30x40","35x45","40x50","45x60","50x70"],
   121:["20x30","30x40","35x45","40x50","45x60","50x70"],
   124:["20x25","25x35","30x30","37x50"],
-  126:["20x25","25x35"]
+  126:["20x25","25x35"],
+129:["25x35","30x40","35x45","40x50","50x70","60x90"],
+130:["25x35","30x40","35x45","40x50"],
+131:["25x35","30x40","35x45","40x50","50x70"],
+132:["25x35","30x40","35x45","40x50"]
 };
 
 // Q: clave="id" para simples, "id|variante" para variantes
@@ -567,15 +578,15 @@ function verPDF(){
   var dias=['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];
   var mes=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   var secs={0:{l:'CAMISETAS',r:[]},1:{l:'RESIDUOS',r:[]},2:{l:'LAMINA / ARRANQUE',r:[]}};
-  var total=0;
+  var totalPal=0;
   for(var k=0;k<ks.length;k++){
     var key=ks[k],qty=Q[key],id,vn=null;
     if(key.indexOf('|')>=0){var p=key.indexOf('|');id=parseInt(key.substring(0,p));vn=key.substring(p+1);}
     else id=parseInt(key);
-    var pal=D[id][0],pr=D[id][1],t=D[id][2];
-    var bul=qty*pal,sub=bul*pr; total+=sub;
+    var t=D[id][2];
+    totalPal+=qty;
     var nm=vn?vn+' ('+document.querySelector('#p'+id+' .pn').textContent.split(' ')[0]+')':document.querySelector('#p'+id+' .pn').textContent;
-    secs[t].r.push([nm,qty,bul,sub]);
+    secs[t].r.push([nm,qty]);
   }
   var rows='';
   for(var t=0;t<3;t++){
@@ -583,7 +594,7 @@ function verPDF(){
     rows+='<tr style="background:#1a3a5c;color:#fff"><td colspan="4" style="padding:8px 10px;font-weight:800">'+secs[t].l+'</td></tr>';
     for(var r=0;r<secs[t].r.length;r++){
       var row=secs[t].r[r];
-      rows+='<tr><td style="padding:8px 10px">'+row[0]+'</td><td style="padding:8px 10px;text-align:center">'+row[1]+'</td><td style="padding:8px 10px;text-align:center">'+row[2]+'</td><td style="padding:8px 10px;text-align:right">'+fmt(row[3])+'</td></tr>';
+      rows+='<tr><td style="padding:8px 10px">'+row[0]+'</td><td style="padding:8px 10px;text-align:center">'+row[1]+' pal</td></tr>';
     }
   }
   var html='<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Pedido Fenix</title>'
@@ -598,9 +609,9 @@ function verPDF(){
     +'</style></head><body>'
     +'<h1>Pedido Papelera Fenix</h1>'
     +'<div class="sub">'+dias[d.getDay()]+', '+d.getDate()+' de '+mes[d.getMonth()]+' '+d.getFullYear()+'&nbsp;&nbsp;|&nbsp;&nbsp;Empleado: <b>'+nom+'</b></div>'
-    +'<table><tr><th>Producto</th><th style="text-align:center">Pallets</th><th style="text-align:center">Bultos</th><th style="text-align:right">Subtotal</th></tr>'
+    +'<table><tr><th>Producto</th><th style="text-align:center">Pallets</th></tr>'
     +rows+'</table>'
-    +'<div class="tot">TOTAL: '+fmt(total)+'</div>'
+    +'<div class="tot">'+totalPal+' pallets en total</div>'
     +'<button class="noPrint" onclick="window.print()" style="padding:12px 28px;background:#1a3a5c;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer">Imprimir / Guardar PDF</button>'
     +'</body></html>';
   var w=window.open('','_blank');
