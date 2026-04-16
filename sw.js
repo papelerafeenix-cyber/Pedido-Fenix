@@ -1,4 +1,4 @@
-const CACHE = 'pedido-fenix-v1';
+const CACHE = 'pedido-fenix-v2';
 const FILES = [
   '/Pedido-Fenix/pedido_deposito.html'
 ];
@@ -20,7 +20,12 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Network first: intenta red, si falla usa cache
   e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
+    fetch(e.request).then(res => {
+      var copy = res.clone();
+      caches.open(CACHE).then(c => c.put(e.request, copy));
+      return res;
+    }).catch(() => caches.match(e.request))
   );
 });
