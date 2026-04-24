@@ -1,6 +1,7 @@
-const CACHE = 'pedido-fenix-v2';
+const CACHE = 'pedido-fenix-v3';
 const FILES = [
-  '/Pedido-Fenix/pedido_deposito.html'
+  '/Pedido-Fenix/pedido_deposito.html',
+  '/Pedido-Fenix/manifest.json'
 ];
 
 self.addEventListener('install', e => {
@@ -20,12 +21,18 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Network first: intenta red, si falla usa cache
+  // Cache-first: sirve desde cache al instante (no depende de la red).
+  // Actualiza el cache en background para que la próxima visita tenga la versión nueva.
   e.respondWith(
-    fetch(e.request).then(res => {
-      var copy = res.clone();
-      caches.open(CACHE).then(c => c.put(e.request, copy));
-      return res;
-    }).catch(() => caches.match(e.request))
+    caches.match(e.request).then(cached => {
+      var update = fetch(e.request).then(res => {
+        if (res.ok) {
+          var copy = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, copy));
+        }
+        return res;
+      }).catch(() => cached);
+      return cached || update;
+    })
   );
 });
