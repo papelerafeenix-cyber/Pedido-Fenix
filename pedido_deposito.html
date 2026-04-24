@@ -644,21 +644,34 @@ function verPDF(){
   var nom=document.getElementById('nom').value.trim()||'sin nombre';
   var d=new Date();
   var dias=['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];
+  var diaC=['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
   var mes=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var mesC=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
   var b=buildItems(),secs=b.secs,ord=b.ord,totalPal=b.totalPal;
   var seclabels={0:'CAMISETAS',1:'RESIDUOS',2:'LAMINA / ARRANQUE'};
+  var seclabelsWA={0:'CAMISETAS',1:'RESIDUOS',2:'LAMINA'};
   var rows='';
+  // Construir mensaje WA en paralelo
+  var msg='*PEDIDO FENIX*\n';
+  msg+=diaC[d.getDay()]+' '+d.getDate()+' '+mesC[d.getMonth()]+' \u2022 '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+'\n';
+  msg+=nom+'\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\n';
   for(var t=0;t<3;t++){
     if(!ord[t].length) continue;
     rows+='<tr style="background:#1a3a5c;color:#fff"><td colspan="2" style="padding:8px 10px;font-weight:800">'+seclabels[t]+'</td></tr>';
+    msg+='*'+seclabelsWA[t]+'*\n';
     for(var ci=0;ci<ord[t].length;ci++){
       var cat=ord[t][ci],items=secs[t].cats[cat];
-      if(cat) rows+='<tr style="background:#1a3a5c;color:#fff"><td colspan="2" style="padding:8px 10px;font-weight:800">'+cat+'</td></tr>';
+      if(cat){rows+='<tr style="background:#1a3a5c;color:#fff"><td colspan="2" style="padding:8px 10px;font-weight:800">'+cat+'</td></tr>';msg+='_'+cat+'_\n';}
       for(var r=0;r<items.length;r++){
         rows+='<tr><td style="padding:8px 10px">'+items[r].nm+'</td><td style="padding:8px 10px;text-align:center">'+items[r].qty+' pal</td></tr>';
+        msg+='\u2022 '+items[r].nm+': *'+items[r].qty+' pal*\n';
       }
     }
+    msg+='\n';
   }
+  msg+='\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n*'+totalPal+' pallets en total*';
+  var waUrl='https://wa.me/?text='+encodeURIComponent(msg);
+  var waBtn='<a href="'+waUrl+'" target="_blank" class="noPrint" style="display:inline-block;padding:12px 28px;background:#25D366;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer;text-decoration:none;margin-right:10px">&#128073; Enviar por WhatsApp</a>';
   var html='<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Pedido Fenix</title>'
     +'<style>body{font-family:Arial,sans-serif;max-width:650px;margin:24px auto;padding:0 16px;color:#111}'
     +'h1{color:#1a3a5c;font-size:22px;margin-bottom:2px}'
@@ -674,6 +687,7 @@ function verPDF(){
     +'<table><tr><th>Producto</th><th style="text-align:center">Pallets</th></tr>'
     +rows+'</table>'
     +'<div class="tot">'+totalPal+' pallets en total</div>'
+    +waBtn
     +'<button class="noPrint" onclick="window.print()" style="padding:12px 28px;background:#1a3a5c;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer">Imprimir / Guardar PDF</button>'
     +'</body></html>';
   var w=window.open('','_blank');
