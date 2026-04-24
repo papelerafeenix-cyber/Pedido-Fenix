@@ -1,35 +1,35 @@
-const CACHE = 'pedido-fenix-v4';
-const FILES = ['/Pedido-Fenix/pedido_deposito.html'];
+const CACHE = 'pedido-fenix-v5';
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(FILES))
+    caches.open(CACHE)
+      .then(c => c.add('/Pedido-Fenix/pedido_deposito.html'))
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    )
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-// Solo intercepta la navegación al HTML.
-// Intenta red con timeout de 3s — si hay corte breve (ej. WiFi→5G)
-// sirve desde cache sin interrumpir la app.
 self.addEventListener('fetch', e => {
   if (e.request.mode !== 'navigate') return;
   e.respondWith(
-    Promise.race([
-      fetch(e.request).then(res => {
-        var copy = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, copy));
-        return res;
-      }),
-      new Promise((_, reject) => setTimeout(reject, 3000))
-    ]).catch(() => caches.match(e.request))
+    caches.open(CACHE).then(c =>
+      c.match(e.request).then(cached => {
+        if (cached) {
+          fetch(e.request).then(res => { if (res.ok) c.put(e.request, res); }).catch(() => {});
+          return cached;
+        }
+        return fetch(e.request).then(res => {
+          if (res.ok) c.put(e.request, res.clone());
+          return res;
+        });
+      })
+    )
   );
 });
