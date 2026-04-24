@@ -1,8 +1,5 @@
-const CACHE = 'pedido-fenix-v3';
-const FILES = [
-  '/Pedido-Fenix/pedido_deposito.html',
-  '/Pedido-Fenix/manifest.json'
-];
+const CACHE = 'pedido-fenix-v4';
+const FILES = ['/Pedido-Fenix/pedido_deposito.html'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
@@ -20,19 +17,19 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
+// Solo intercepta la navegación al HTML.
+// Intenta red con timeout de 3s — si hay corte breve (ej. WiFi→5G)
+// sirve desde cache sin interrumpir la app.
 self.addEventListener('fetch', e => {
-  // Cache-first: sirve desde cache al instante (no depende de la red).
-  // Actualiza el cache en background para que la próxima visita tenga la versión nueva.
+  if (e.request.mode !== 'navigate') return;
   e.respondWith(
-    caches.match(e.request).then(cached => {
-      var update = fetch(e.request).then(res => {
-        if (res.ok) {
-          var copy = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, copy));
-        }
+    Promise.race([
+      fetch(e.request).then(res => {
+        var copy = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, copy));
         return res;
-      }).catch(() => cached);
-      return cached || update;
-    })
+      }),
+      new Promise((_, reject) => setTimeout(reject, 3000))
+    ]).catch(() => caches.match(e.request))
   );
 });
