@@ -1,4 +1,4 @@
-const CACHE = 'pedido-fenix-v5';
+const CACHE = 'pedido-fenix-v6';
 
 self.addEventListener('install', e => {
   e.waitUntil(
@@ -13,6 +13,8 @@ self.addEventListener('activate', e => {
     caches.keys()
       .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
+      .then(() => self.clients.matchAll({ type: 'window' }))
+      .then(clients => clients.forEach(client => client.navigate(client.url)))
   );
 });
 
