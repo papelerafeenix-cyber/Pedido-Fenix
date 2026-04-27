@@ -134,7 +134,7 @@ body.osc .vocount b{color:#7fb8f0}
   </div>
 </div>
 
-<div class="bar"><input id="nom" type="text" placeholder="Nombre del empleado..." autocomplete="off"></div>
+<div class="bar"><input id="nom" type="text" placeholder="Nombre del empleado..." autocomplete="off" oninput="try{localStorage.setItem('nom',this.value)}catch(e){}"></div>
 <div class="bar"><input id="srch" type="search" placeholder="&#128269; Buscar producto..." oninput="buscar()" autocomplete="off"></div>
 
 <div class="tabs">
@@ -436,6 +436,9 @@ var Q={};
 var tabActual=0;
 var varId=null;
 
+function saveQ(){try{localStorage.setItem('Q',JSON.stringify(Q));}catch(e){}}
+function loadQ(){try{var s=localStorage.getItem('Q');if(s)Q=JSON.parse(s);}catch(e){}}
+
 // ── CORE ──────────────────────────────────────────────
 function q(id,d){
   if(V[id]){
@@ -449,7 +452,7 @@ function q(id,d){
   }
   var n=Math.max(0,(Q[id]||0)+d);
   if(n===0) delete Q[id]; else Q[id]=n;
-  updRow(id); updHdr();
+  updRow(id); updHdr(); saveQ();
 }
 
 function qv(id,v,d){
@@ -463,7 +466,7 @@ function qv(id,v,d){
       if(vs[i]===v){var el=document.getElementById('vv'+id+'_'+i);if(el)el.textContent=n;break;}
     }
   }
-  updRow(id); updHdr();
+  updRow(id); updHdr(); saveQ();
 }
 
 function totProd(id){
@@ -605,7 +608,7 @@ function borrar(){
   Q={};
   var ps=document.querySelectorAll('.p');
   for(var i=0;i<ps.length;i++){ps[i].className='p';var vn=ps[i].querySelector('.pv-n');if(vn)vn.textContent='0';}
-  updHdr(); cerrar();
+  updHdr(); cerrar(); saveQ();
 }
 
 // ── ENVIAR WA ─────────────────────────────────────────
@@ -730,6 +733,17 @@ function toggleOsc(){
 }
 (function(){
   try{if(localStorage.getItem('osc')){document.body.classList.add('osc');document.getElementById('btnosc').textContent='☀';}}catch(e){}
+  // Restaurar carrito y nombre guardados
+  loadQ();
+  try{var nom=localStorage.getItem('nom');if(nom)document.getElementById('nom').value=nom;}catch(e){}
+  if(Object.keys(Q).length){
+    var ks=Object.keys(Q);
+    for(var i=0;i<ks.length;i++){
+      var key=ks[i],id=key.indexOf('|')>=0?parseInt(key.split('|')[0]):parseInt(key);
+      updRow(id);
+    }
+    updHdr();
+  }
 })();
 
 if('serviceWorker' in navigator){
