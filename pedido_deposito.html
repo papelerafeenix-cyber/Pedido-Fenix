@@ -752,7 +752,6 @@ function verPDF(){
   saveHistorial('pdf');
   var pdfBlob=doc.output('blob');
   var file=new File([pdfBlob],fname,{type:'application/pdf'});
-  borrar();
   if(navigator.canShare && navigator.canShare({files:[file]})){
     navigator.share({files:[file],title:'Pedido Fenix - '+nom}).catch(function(){
       var url=URL.createObjectURL(pdfBlob);
