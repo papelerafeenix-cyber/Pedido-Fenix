@@ -372,8 +372,8 @@ body.osc .hitem-row{border-bottom-color:#2a2f3e;color:#dde3f0}
     <div class="pbody" id="pbody"></div>
     <div class="ppie">
       <div class="ptotal"><span>TOTAL</span><span id="ptot">$0</span></div>
-      <button class="btn-wa" data-a="enviar">Enviar por WhatsApp</button>
-      <button class="btn-pdf" data-a="pdf">Ver / Imprimir PDF</button>
+      <button class="btn-wa" data-a="enviar">Enviar texto por WhatsApp</button>
+      <button class="btn-pdf" data-a="pdf">Compartir PDF (WhatsApp / Mail)</button>
       <button class="btn-del" data-a="borrar">Borrar pedido</button>
     </div>
   </div>
@@ -752,12 +752,20 @@ function verPDF(){
   saveHistorial('pdf');
   var pdfBlob=doc.output('blob');
   var file=new File([pdfBlob],fname,{type:'application/pdf'});
-  if(navigator.canShare && navigator.canShare({files:[file]})){
-    navigator.share({files:[file],title:'Pedido Fenix'}).catch(function(){});
-  } else {
-    doc.save(fname);
-  }
   borrar();
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    navigator.share({files:[file],title:'Pedido Fenix - '+nom}).catch(function(){
+      var url=URL.createObjectURL(pdfBlob);
+      var a=document.createElement('a');a.href=url;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout(function(){URL.revokeObjectURL(url);},5000);
+      alert('PDF descargado. Abrí WhatsApp, tocá el clip 📎 y buscalo en Descargas.');
+    });
+  } else {
+    var url=URL.createObjectURL(pdfBlob);
+    var a=document.createElement('a');a.href=url;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},5000);
+    alert('PDF descargado. Abrí WhatsApp, tocá el clip 📎 y buscalo en Descargas.');
+  }
 }
 
 // ── HISTORIAL ─────────────────────────────────────────
