@@ -693,9 +693,11 @@ function verPDF(){
     +waBtn
     +'<button class="noPrint" onclick="window.print()" style="padding:12px 28px;background:#1a3a5c;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer">Imprimir / Guardar PDF</button>'
     +'</body></html>';
-  var w=window.open('','_blank');
-  if(w){w.document.write(html);w.document.close();}
-  else alert('Permiti las ventanas emergentes para ver el PDF.');
+  var blob=new Blob([html],{type:'text/html'});
+  var url=URL.createObjectURL(blob);
+  var w=window.open(url,'_blank');
+  if(!w) alert('Permiti las ventanas emergentes para ver el PDF.');
+  setTimeout(function(){URL.revokeObjectURL(url);},60000);
 }
 
 // ── DISPATCHER GLOBAL ─────────────────────────────────
