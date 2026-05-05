@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Pedido Fenix</title>
 <link rel="manifest" href="manifest.json">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <meta name="theme-color" content="#1a3a5c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -710,32 +712,45 @@ function verPDF(){
     msg+='\n';
   }
   msg+='\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n*'+totalPal+' pallets en total*';
-  var waUrl='https://wa.me/?text='+encodeURIComponent(msg);
-  var waBtn='<a href="'+waUrl+'" target="_blank" class="noPrint" style="display:inline-block;padding:12px 28px;background:#25D366;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer;text-decoration:none;margin-right:10px">&#128073; Enviar por WhatsApp</a>';
-  var html='<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Pedido Fenix</title>'
-    +'<style>body{font-family:Arial,sans-serif;max-width:650px;margin:24px auto;padding:0 16px;color:#111}'
-    +'h1{color:#1a3a5c;font-size:22px;margin-bottom:2px}'
-    +'.sub{color:#666;font-size:14px;margin-bottom:20px}'
-    +'table{width:100%;border-collapse:collapse;font-size:14px}'
-    +'th{background:#eef2f7;color:#1a3a5c;padding:8px 10px;text-align:left;font-size:12px;text-transform:uppercase}'
-    +'tr:nth-child(even) td{background:#f9f9f9}'
-    +'.tot{text-align:right;font-size:20px;font-weight:800;color:#1a3a5c;padding:16px 0}'
-    +'@media print{.noPrint{display:none}}'
-    +'</style></head><body>'
-    +'<h1>Pedido Papelera Fenix</h1>'
-    +'<div class="sub">'+dias[d.getDay()]+', '+d.getDate()+' de '+mes[d.getMonth()]+' '+d.getFullYear()+'&nbsp;&nbsp;|&nbsp;&nbsp;Empleado: <b>'+nom+'</b></div>'
-    +'<table><tr><th>Producto</th><th style="text-align:center">Pallets</th></tr>'
-    +rows+'</table>'
-    +'<div class="tot">'+totalPal+' pallets en total</div>'
-    +waBtn
-    +'<button class="noPrint" onclick="window.print()" style="padding:12px 28px;background:#1a3a5c;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer">Imprimir / Guardar PDF</button>'
-    +'</body></html>';
+  if(!window.jspdf){alert('El generador de PDF aún no cargó. Revisá la conexión y reintentá.');return;}
+  var azul=[26,58,92],blanco=[255,255,255],grisClaro=[238,242,247];
+  var doc=new window.jspdf.jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  // Encabezado
+  doc.setFillColor(azul[0],azul[1],azul[2]);
+  doc.rect(0,0,210,28,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(17);
+  doc.text('PEDIDO PAPELERA FENIX',14,12);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','normal');
+  var fechaStr=dias[d.getDay()]+', '+d.getDate()+' de '+mes[d.getMonth()]+' '+d.getFullYear();
+  var horaStr=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+  doc.text(fechaStr+'   |   '+horaStr+'   |   Empleado: '+nom,14,22);
+  // Filas de la tabla
+  var body=[];
+  var seclabels={0:'CAMISETAS',1:'RESIDUOS',2:'LAMINA / ARRANQUE'};
+  for(var t=0;t<3;t++){
+    if(!ord[t].length) continue;
+    body.push([{content:seclabels[t],colSpan:2,styles:{fillColor:azul,textColor:blanco,fontStyle:'bold',fontSize:11}}]);
+    for(var ci=0;ci<ord[t].length;ci++){
+      var cat=ord[t][ci],items=secs[t].cats[cat];
+      if(cat) body.push([{content:cat,colSpan:2,styles:{fillColor:grisClaro,textColor:azul,fontStyle:'bold',fontSize:9}}]);
+      for(var r=0;r<items.length;r++) body.push([items[r].nm,items[r].qty+' pal']);
+    }
+  }
+  body.push([{content:'TOTAL: '+totalPal+' pallets',colSpan:2,styles:{fillColor:azul,textColor:blanco,fontStyle:'bold',fontSize:12,halign:'right'}}]);
+  doc.autoTable({
+    startY:32,
+    head:[[{content:'Producto',styles:{fillColor:grisClaro,textColor:azul,fontStyle:'bold'}},{content:'Pallets',styles:{fillColor:grisClaro,textColor:azul,fontStyle:'bold',halign:'center',cellWidth:28}}]],
+    body:body,
+    styles:{fontSize:10,cellPadding:3},
+    columnStyles:{1:{halign:'center',cellWidth:28}},
+    margin:{left:14,right:14}
+  });
+  var fname='Pedido_Fenix_'+nom.replace(/\s+/g,'_')+'_'+d.getDate()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'.pdf';
   saveHistorial('pdf');
-  var blob=new Blob([html],{type:'text/html'});
-  var url=URL.createObjectURL(blob);
-  var w=window.open(url,'_blank');
-  if(!w) alert('Permiti las ventanas emergentes para ver el PDF.');
-  setTimeout(function(){URL.revokeObjectURL(url);},60000);
+  doc.save(fname);
   borrar();
 }
 
