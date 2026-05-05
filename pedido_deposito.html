@@ -750,7 +750,13 @@ function verPDF(){
   });
   var fname='Pedido_Fenix_'+nom.replace(/\s+/g,'_')+'_'+d.getDate()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'.pdf';
   saveHistorial('pdf');
-  doc.save(fname);
+  var pdfBlob=doc.output('blob');
+  var file=new File([pdfBlob],fname,{type:'application/pdf'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    navigator.share({files:[file],title:'Pedido Fenix'}).catch(function(){});
+  } else {
+    doc.save(fname);
+  }
   borrar();
 }
 
