@@ -122,6 +122,26 @@ body.osc .vtit{color:#7fb8f0}
 body.osc .vopt{border-bottom-color:#2a2f3e}
 body.osc .voname{color:#dde3f0}
 body.osc .vocount b{color:#7fb8f0}
+
+/* HISTORIAL */
+.hov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:flex-end}
+.hov.on{display:flex}
+.hitem{border-bottom:1px solid #eee}
+.hitem-hd{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer;user-select:none;-webkit-user-select:none}
+.hitem-fecha{font-size:12px;color:#aaa}
+.hitem-nom{font-size:15px;font-weight:800;margin-top:2px}
+.hitem-pal{font-size:14px;font-weight:800;color:#1a3a5c}
+.hitem-arr{font-size:14px;color:#aaa;transition:transform .2s}
+.hitem.open .hitem-arr{transform:rotate(90deg)}
+.hitem-bd{display:none;padding:0 16px 12px;background:#f9f9f9}
+.hitem.open .hitem-bd{display:block}
+.hitem-row{display:flex;justify-content:space-between;padding:6px 0;font-size:14px;border-bottom:1px solid #f0f0f0}
+.hitem-row:last-child{border-bottom:none}
+body.osc .hitem{border-bottom-color:#2a2f3e}
+body.osc .hitem-nom{color:#dde3f0}
+body.osc .hitem-pal{color:#7fb8f0}
+body.osc .hitem-bd{background:#11151e}
+body.osc .hitem-row{border-bottom-color:#2a2f3e;color:#dde3f0}
 </style>
 </head>
 <body>
@@ -130,6 +150,7 @@ body.osc .vocount b{color:#7fb8f0}
   <div><div class="htitle">Pedido Deposito</div><div class="hsubt" id="hsubt">0 pallets · $0</div></div>
   <div style="display:flex;align-items:center;gap:6px">
     <button class="btnosc" id="btnosc" onclick="toggleOsc()">🌙</button>
+    <button class="btnosc" data-a="hist" title="Historial">&#128203;</button>
     <button class="btnped" data-a="panel">Pedido <span class="bdg" id="bdg">0</span></button>
   </div>
 </div>
@@ -328,6 +349,17 @@ body.osc .vocount b{color:#7fb8f0}
     <div class="vtit" id="vtit"></div>
     <div id="vopts"></div>
     <button class="vdone" data-a="closevar">Listo</button>
+  </div>
+</div>
+
+<!-- HISTORY PANEL -->
+<div class="hov" id="hov" onclick="if(event.target===this)cerrarHist()">
+  <div class="panel">
+    <div class="ptop"><h2>Historial</h2><button class="xbtn" data-a="closehist">×</button></div>
+    <div class="pbody" id="hbody"></div>
+    <div class="ppie">
+      <button class="btn-del" data-a="borrhist">Borrar historial</button>
+    </div>
   </div>
 </div>
 
@@ -635,6 +667,7 @@ function enviar(){
     msg+='\n';
   }
   msg+='\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n*'+totalPal+' pallets en total*';
+  saveHistorial('wa');
   var a=document.createElement('a');
   a.href='https://wa.me/?text='+encodeURIComponent(msg);
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
@@ -693,11 +726,75 @@ function verPDF(){
     +waBtn
     +'<button class="noPrint" onclick="window.print()" style="padding:12px 28px;background:#1a3a5c;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer">Imprimir / Guardar PDF</button>'
     +'</body></html>';
+  saveHistorial('pdf');
   var blob=new Blob([html],{type:'text/html'});
   var url=URL.createObjectURL(blob);
   var w=window.open(url,'_blank');
   if(!w) alert('Permiti las ventanas emergentes para ver el PDF.');
   setTimeout(function(){URL.revokeObjectURL(url);},60000);
+}
+
+// ── HISTORIAL ─────────────────────────────────────────
+function saveHistorial(via){
+  var ks=Object.keys(Q);
+  if(!ks.length) return;
+  var nom=document.getElementById('nom').value.trim()||'sin nombre';
+  var b=buildItems(),secs=b.secs,ord=b.ord,totalPal=b.totalPal;
+  var items=[];
+  for(var t=0;t<3;t++){
+    for(var ci=0;ci<ord[t].length;ci++){
+      var cat=ord[t][ci],its=secs[t].cats[cat];
+      for(var r=0;r<its.length;r++) items.push({nm:its[r].nm,qty:its[r].qty});
+    }
+  }
+  var hist=[];
+  try{var s=localStorage.getItem('hist');if(s)hist=JSON.parse(s);}catch(e){}
+  hist.unshift({ts:Date.now(),nom:nom,totalPal:totalPal,via:via,items:items});
+  if(hist.length>50) hist.length=50;
+  try{localStorage.setItem('hist',JSON.stringify(hist));}catch(e){}
+}
+
+function verHistorial(){
+  var hist=[];
+  try{var s=localStorage.getItem('hist');if(s)hist=JSON.parse(s);}catch(e){}
+  var body=document.getElementById('hbody');
+  if(!hist.length){
+    body.innerHTML='<div class="vacio">Sin pedidos enviados aún.</div>';
+  } else {
+    var dias=['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
+    var mes=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    var html='';
+    for(var i=0;i<hist.length;i++){
+      var e=hist[i];
+      var d=new Date(e.ts);
+      var fecha=dias[d.getDay()]+' '+d.getDate()+'/'+mes[d.getMonth()]+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+      var bcolor=e.via==='wa'?'#25D366':'#1a3a5c';
+      var blabel=e.via==='wa'?'WA':'PDF';
+      html+='<div class="hitem">'
+        +'<div class="hitem-hd" onclick="this.parentElement.classList.toggle(\'open\')">'
+        +'<div><div class="hitem-fecha">'+fecha+'</div><div class="hitem-nom">'+e.nom+'</div></div>'
+        +'<div style="display:flex;align-items:center;gap:8px">'
+        +'<span style="background:'+bcolor+';color:#fff;font-size:11px;font-weight:800;border-radius:4px;padding:2px 7px">'+blabel+'</span>'
+        +'<span class="hitem-pal">'+e.totalPal+' pal</span>'
+        +'<span class="hitem-arr">&#9658;</span>'
+        +'</div></div>'
+        +'<div class="hitem-bd">';
+      for(var j=0;j<e.items.length;j++){
+        html+='<div class="hitem-row"><span>'+e.items[j].nm+'</span><span>'+e.items[j].qty+' pal</span></div>';
+      }
+      html+='</div></div>';
+    }
+    body.innerHTML=html;
+  }
+  document.getElementById('hov').classList.add('on');
+}
+
+function cerrarHist(){document.getElementById('hov').classList.remove('on');}
+
+function borrarHist(){
+  if(!confirm('¿Borrar todo el historial?')) return;
+  try{localStorage.removeItem('hist');}catch(e){}
+  cerrarHist();
 }
 
 // ── DISPATCHER GLOBAL ─────────────────────────────────
@@ -715,6 +812,9 @@ document.addEventListener('click', function(e){
   else if(a==='borrar'){ borrar(); }
   else if(a==='enviar'){ enviar(); }
   else if(a==='pdf')  { verPDF(); }
+  else if(a==='hist')     { verHistorial(); }
+  else if(a==='closehist'){ cerrarHist(); }
+  else if(a==='borrhist') { borrarHist(); }
   else if(a==='closevar'){ cerrarVar(); }
   else if(a==='qv')   { qv(parseInt(t.dataset.i), t.dataset.v, parseInt(t.dataset.d)); }
 });
