@@ -648,7 +648,8 @@ function borrar(){
 function enviar(){
   var ks=Object.keys(Q);
   if(!ks.length){alert('No hay productos.');return;}
-  var nom=document.getElementById('nom').value.trim()||'sin nombre';
+  var nom=document.getElementById('nom').value.trim();
+  if(!nom){alert('Ingresá tu nombre antes de enviar.');document.getElementById('nom').focus();return;}
   var d=new Date();
   var dias=['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
   var mes=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
@@ -672,13 +673,15 @@ function enviar(){
   var a=document.createElement('a');
   a.href='https://wa.me/?text='+encodeURIComponent(msg);
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  borrar();
 }
 
 // ── PDF ───────────────────────────────────────────────
 function verPDF(){
   var ks=Object.keys(Q);
   if(!ks.length){alert('No hay productos.');return;}
-  var nom=document.getElementById('nom').value.trim()||'sin nombre';
+  var nom=document.getElementById('nom').value.trim();
+  if(!nom){alert('Ingresá tu nombre antes de enviar.');document.getElementById('nom').focus();return;}
   var d=new Date();
   var dias=['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];
   var diaC=['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
@@ -733,6 +736,7 @@ function verPDF(){
   var w=window.open(url,'_blank');
   if(!w) alert('Permiti las ventanas emergentes para ver el PDF.');
   setTimeout(function(){URL.revokeObjectURL(url);},60000);
+  borrar();
 }
 
 // ── HISTORIAL ─────────────────────────────────────────
