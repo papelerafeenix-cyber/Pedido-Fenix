@@ -606,7 +606,8 @@ function buildItems(){
     else id=parseInt(key);
     var t=D[id][2]; totalPal+=qty;
     var cat=C[id]||'';
-    var nm=vn?vn+' ('+document.querySelector('#p'+id+' .pn').textContent.split(' ')[0]+')':document.querySelector('#p'+id+' .pn').textContent;
+    var pnm=document.querySelector('#p'+id+' .pn').textContent;
+    var nm=vn?pnm+' - '+vn:pnm;
     if(!secs[t].cats[cat]){secs[t].cats[cat]=[];ord[t].push(cat);}
     secs[t].cats[cat].push({nm:nm,qty:qty});
   }
