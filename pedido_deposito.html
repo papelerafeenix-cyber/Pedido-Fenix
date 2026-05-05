@@ -782,7 +782,7 @@ function saveHistorial(via){
   }
   var hist=[];
   try{var s=localStorage.getItem('hist');if(s)hist=JSON.parse(s);}catch(e){}
-  hist.unshift({ts:Date.now(),nom:nom,totalPal:totalPal,via:via,items:items});
+  hist.unshift({ts:Date.now(),nom:nom,totalPal:totalPal,via:via,items:items,rawQ:JSON.parse(JSON.stringify(Q))});
   if(hist.length>50) hist.length=50;
   try{localStorage.setItem('hist',JSON.stringify(hist));}catch(e){}
 }
@@ -815,6 +815,9 @@ function verHistorial(){
       for(var j=0;j<e.items.length;j++){
         html+='<div class="hitem-row"><span>'+e.items[j].nm+'</span><span>'+e.items[j].qty+' pal</span></div>';
       }
+      if(e.rawQ){
+        html+='<button onclick="cargarPedido('+i+')" style="width:100%;margin-top:10px;padding:10px;background:#25D366;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:800">Cargar y editar este pedido</button>';
+      }
       html+='</div></div>';
     }
     body.innerHTML=html;
@@ -823,6 +826,26 @@ function verHistorial(){
 }
 
 function cerrarHist(){document.getElementById('hov').classList.remove('on');}
+
+function cargarPedido(idx){
+  var hist=[];
+  try{var s=localStorage.getItem('hist');if(s)hist=JSON.parse(s);}catch(e){}
+  var e=hist[idx];
+  if(!e||!e.rawQ) return;
+  Q=JSON.parse(JSON.stringify(e.rawQ));
+  saveQ();
+  var ps=document.querySelectorAll('.p');
+  for(var i=0;i<ps.length;i++){var vn=ps[i].querySelector('.pv-n');if(vn)vn.textContent='0';ps[i].className='p';}
+  var ks=Object.keys(Q);
+  for(var k=0;k<ks.length;k++){
+    var id=parseInt(ks[k]);
+    if(!isNaN(id)) updRow(id);
+    else{var p=ks[k].indexOf('|');if(p>=0)updRow(parseInt(ks[k].substring(0,p)));}
+  }
+  updHdr();
+  cerrarHist();
+  abrirPanel();
+}
 
 function borrarHist(){
   if(!confirm('¿Borrar todo el historial?')) return;
