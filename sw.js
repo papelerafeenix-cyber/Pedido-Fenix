@@ -1,4 +1,4 @@
-const CACHE = 'pedido-fenix-v15';
+const CACHE = 'pedido-fenix-v16';
 
 self.addEventListener('install', e => {
   e.waitUntil(
