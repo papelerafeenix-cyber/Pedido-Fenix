@@ -314,9 +314,30 @@ body.osc .nscan{color:#555;border-color:#252525}
   </div>
 </div>
 
-<div class="zov" id="zov" onclick="this.classList.remove('on')"><img id="zimg" src="" alt=""></div>
+<div class="zov" id="zov" onclick="ovClose('zov')"><img id="zimg" src="" alt=""></div>
 
 <script>
+// ── OVERLAY MANAGER (back del celular cierra el modal) ─
+function ovOpen(id){
+  var el=document.getElementById(id); if(!el) return;
+  if(id==='vov') el.style.display='flex'; else el.classList.add('on');
+  try{ history.pushState({ov:id},''); }catch(e){}
+}
+function ovClose(id){
+  var el=document.getElementById(id); if(!el) return;
+  if(id==='vov') el.style.display='none'; else el.classList.remove('on');
+  try{ if(history.state && history.state.ov===id) history.back(); }catch(e){}
+}
+window.addEventListener('popstate',function(){
+  var ids=['zov','vov','nsov','ovl','hov'];
+  for(var i=0;i<ids.length;i++){
+    var el=document.getElementById(ids[i]); if(!el) continue;
+    var isV=ids[i]==='vov';
+    var open=isV?el.style.display==='flex':el.classList.contains('on');
+    if(open){ if(isV) el.style.display='none'; else el.classList.remove('on'); return; }
+  }
+});
+
 // ── SUPPLIERS CONFIG ───────────────────────────────────
 var DI=["CARITA SURTIDA","GATO","PANDA","CAPIBARA","BOLSA AUTORIZADA","CIUDAD","BOL. CORAZON","ARG. CORAZON"];
 
@@ -807,13 +828,13 @@ function abrirVar(id){
       +'</div></div>';
   }
   document.getElementById('vopts').innerHTML=html;
-  document.getElementById('vov').style.display='flex';
+  ovOpen('vov');
 }
-function cerrarVar(){document.getElementById('vov').style.display='none';varId=null;}
+function cerrarVar(){ovClose('vov');varId=null;}
 
 // ── CARRITO ───────────────────────────────────────────
-function abrirPanel(){renderCart();document.getElementById('ovl').className='ovl on';}
-function cerrar(){document.getElementById('ovl').className='ovl';}
+function abrirPanel(){renderCart();ovOpen('ovl');}
+function cerrar(){ovClose('ovl');}
 
 function buildItems(){
   var ks=Object.keys(Q),totalPal=0,tkg=0;
@@ -1050,10 +1071,10 @@ function verHistorial(){
     }
     body.innerHTML=html;
   }
-  document.getElementById('hov').classList.add('on');
+  ovOpen('hov');
 }
 
-function cerrarHist(){document.getElementById('hov').classList.remove('on');}
+function cerrarHist(){ovClose('hov');}
 
 function cargarPedido(idx){
   var hist=[];
@@ -1077,10 +1098,10 @@ function borrarHist(){
 // ── NUEVO PROVEEDOR ───────────────────────────────────
 function abrirNS(){
   document.getElementById('nsNom').value='';
-  document.getElementById('nsov').classList.add('on');
+  ovOpen('nsov');
   setTimeout(function(){document.getElementById('nsNom').focus();},100);
 }
-function cerrarNS(){document.getElementById('nsov').classList.remove('on');}
+function cerrarNS(){ovClose('nsov');}
 function guardarNS(){
   var nom=document.getElementById('nsNom').value.trim().toUpperCase();
   if(!nom){alert('Ingresá el nombre del proveedor.');return;}
@@ -1116,7 +1137,7 @@ document.addEventListener('click',function(e){
   else if(a==='borrhist')  { borrarHist(); }
   else if(a==='closevar')  { cerrarVar(); }
   else if(a==='qv')    { qv(parseInt(t.dataset.i),t.dataset.v,parseInt(t.dataset.d)); }
-  else if(a==='zoom')  { var z=document.getElementById('zimg'); z.src=t.getAttribute('src'); document.getElementById('zov').classList.add('on'); }
+  else if(a==='zoom')  { var z=document.getElementById('zimg'); z.src=t.getAttribute('src'); ovOpen('zov'); }
   else if(a==='setunit'){ setUnit(t.dataset.u); }
 });
 
